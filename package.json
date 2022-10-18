@@ -8,9 +8,11 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "start": "node app.js"
+    "start": "node start.js"
   },
   "dependencies": {
+    "cors": "^2.8.5",
+    "esm": "^3.2.25",
     "express": "^4.16.3"
   },
   "engines": {

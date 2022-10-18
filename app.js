@@ -1,11 +1,16 @@
-const express = require("express");
+import express from "express";
+import cors from "cors";
+
 const app = express();
 const port = process.env.PORT || 3001;
 
+app.use(cors());
+
 app.get("/", (req, res) => res.type('html').send(html));
+app.get("/bandung", (req, res) => {return res.json({"kota": "bandung", "kampus": "ITB"})});
+app.get("/kartu", (req, res) => {return res.json({"cards": ["https://cf-vanguard.my/wp-content/uploads/2022/08/D_SD01_001BH.png", "https://cf-vanguard.my/wp-content/uploads/2022/06/D_SD01_card_v3_02.jpg"]})})
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
-
 
 const html = `
 <!DOCTYPE html>
