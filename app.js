@@ -1,16 +1,22 @@
 import express from "express";
 import cors from "cors";
+import router from "../TestBE/routes/programmingLanguages";
 
 const app = express();
 const port = process.env.PORT || 3001;
+const db = require("./database");
 
 app.use(cors());
 
-app.get("/", (req, res) => res.type('html').send(html));
-app.get("/bandung", (req, res) => {return res.json({"kota": "bandung", "kampus": "ITB"})});
-app.get("/kartu", (req, res) => {return res.json({"cards": ["https://cf-vanguard.my/wp-content/uploads/2022/08/D_SD01_001BH.png", "https://cf-vanguard.my/wp-content/uploads/2022/06/D_SD01_card_v3_02.jpg"]})})
+app.get("/", (req, res) => res.type("html").send(html));
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+
+app.get("/listkartu", async (req, res) => {
+  const results = await db.promise().query(`SELECT image FROM card`);
+  console.log(results[0].body);
+  return res.json(results[0].body);
+});
 
 const html = `
 <!DOCTYPE html>
@@ -61,4 +67,4 @@ const html = `
     </section>
   </body>
 </html>
-`
+`;
