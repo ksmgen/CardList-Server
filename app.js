@@ -1,6 +1,5 @@
 import express from "express";
 import cors from "cors";
-import router from "../TestBE/routes/programmingLanguages";
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -12,10 +11,14 @@ app.get("/", (req, res) => res.type("html").send(html));
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
-app.get("/listkartu", async (req, res) => {
-  const results = await db.promise().query(`SELECT image FROM card`);
-  console.log(results[0].body);
-  return res.json(results[0].body);
+db.connect(function (err) {
+  if (err) throw err;
+  console.log("Connected!");
+});
+
+app.get("/cardlist", async (req, res) => {
+  const results = await db.promise().query(`SELECT image, SKU FROM card`);
+  return res.json(results[0]);
 });
 
 const html = `
