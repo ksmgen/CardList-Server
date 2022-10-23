@@ -76,13 +76,12 @@ CREATE TABLE `category` (
   `create_date` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `last_update` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`category_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `category` */
 
 insert  into `category`(`category_id`,`name`,`description`,`create_date`,`last_update`) values 
-(1,'VGB-D-SD01','Starter Dek 01: Yu-yu Kondo - Naga Suci -\r','2022-10-21 13:43:50','2022-10-21 13:43:50'),
-(2,'VGB-D-SD01','Starter Dek 01: Yu-yu Kondo - Naga Suci -','2022-10-21 14:57:26','2022-10-21 14:57:26');
+(1,'VGB-D-SD01','Starter Dek 01: Yu-yu Kondo - Naga Suci -\r','2022-10-21 13:43:50','2022-10-21 13:43:50');
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
