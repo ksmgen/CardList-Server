@@ -6,6 +6,23 @@ const port = process.env.PORT || 3001;
 const db = require("./database");
 
 app.use(cors());
+app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+
+db.connect(function (err) {
+  if (err) throw err;
+  console.log("Connected!");
+});
+
+const cardRouter = require("./routes/cardlist.routes");
+app.use("/cardlist", cardRouter);
+
+{
+  /*
+const app = express();
+const port = process.env.PORT || 3001;
+const db = require("./database");
+
+app.use(cors());
 
 app.get("/", (req, res) => res.type("html").send(html));
 
@@ -17,7 +34,11 @@ db.connect(function (err) {
 });
 
 app.get("/cardlist", async (req, res) => {
-  const results = await db.promise().query(`SELECT image, SKU FROM card`);
+  const results = await db
+    .promise()
+    .query(
+      `SELECT * FROM card, category WHERE card.category_id = category.category_id`
+    );
   return res.json(results[0]);
 });
 
@@ -71,3 +92,5 @@ const html = `
   </body>
 </html>
 `;
+*/
+}
