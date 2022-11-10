@@ -11,6 +11,7 @@
     "start": "node start.js"
   },
   "dependencies": {
+    "body-parser": "^1.20.1",
     "cors": "^2.8.5",
     "esm": "^3.2.25",
     "express": "^4.16.3",
