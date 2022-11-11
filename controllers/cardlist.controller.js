@@ -27,7 +27,7 @@ exports.add_card = async (req, res) => {
       card.SKU,
       card.name,
       card.description,
-      card.category_id,
+      parseInt(card.category_id),
       card.image,
       parseInt(card.grade),
       card.nation,
@@ -45,6 +45,21 @@ exports.add_card = async (req, res) => {
   
   res.json(results[0]);
   console.log(card);
+};
+
+exports.add_category = async (req, res) => {
+  const category = req.body;
+  const sql =
+    "INSERT INTO category (name, description) VALUES (?, ?)";
+  const results = await db
+    .promise()
+    .query(sql, [
+      category.name,
+      category.description,
+    ]);
+
+  res.json(results[0]);
+  console.log(category);
 };
 
 
