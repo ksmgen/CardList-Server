@@ -27,7 +27,7 @@ exports.add_card = async (req, res) => {
       card.SKU,
       card.name,
       card.description,
-      parseInt(card.category_id),
+      parseInt(card.categoryId),
       card.image,
       parseInt(card.grade),
       card.nation,
@@ -39,7 +39,7 @@ exports.add_card = async (req, res) => {
       card.regulation,
       parseInt(card.shield),
       card.skill,
-      card.trigger_type,
+      card.triggerType,
       card.type,
     ]);
   
