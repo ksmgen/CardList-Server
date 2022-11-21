@@ -56,6 +56,15 @@ exports.categoryId = async (req, res) => {
   res.json(results[0]);
 };
 
+exports.category = async (req, res) => {
+  const results = await db
+    .promise()
+    .query(
+      `SELECT * FROM category`
+    );
+  res.json(results[0]);
+};
+
 exports.add_category = async (req, res) => {
   const category = req.body;
   const sql =
