@@ -47,6 +47,15 @@ exports.add_card = async (req, res) => {
   console.log(card);
 };
 
+exports.categoryId = async (req, res) => {
+  const results = await db
+    .promise()
+    .query(
+      `SELECT category_id FROM category`
+    );
+  res.json(results[0]);
+};
+
 exports.add_category = async (req, res) => {
   const category = req.body;
   const sql =
