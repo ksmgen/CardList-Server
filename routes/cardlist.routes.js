@@ -11,6 +11,7 @@ router.get("/detail/:id", card_controller.card_detail);
 router.get("/categoryId", card_controller.categoryId);
 router.get("/category", card_controller.category);
 router.post("/addCard", card_controller.add_card);
+router.delete("/delete/:id", card_controller.delete_card);
 router.post("/addCategory", card_controller.add_category);
 router.get("/test", card_controller.card_test);
 
