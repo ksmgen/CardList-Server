@@ -13,6 +13,7 @@ router.get("/category", card_controller.category);
 router.post("/addCard", card_controller.add_card);
 router.delete("/delete/:id", card_controller.delete_card);
 router.post("/addCategory", card_controller.add_category);
+router.put("/editcard/:id", card_controller.edit_card);
 router.get("/test", card_controller.card_test);
 
 module.exports = router;

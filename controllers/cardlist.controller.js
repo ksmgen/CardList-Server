@@ -88,6 +88,39 @@ exports.add_category = async (req, res) => {
   console.log(category);
 };
 
+exports.edit_card = async (req, res) => {
+  const card = req.body;
+  const card_id = req.params.id;
+  console.log(card_id)
+  const sql =
+    "UPDATE card SET SKU = ?, name = ?, text = ?, flavor = ?, category_id = ?, image = ?, grade = ?, nation = ?, rarity = ?, race = ?, critical = ?, illustrator = ?, power = ?, regulation = ?, shield = ?, skill = ?, trigger_type = ?, type = ? WHERE id = ?";
+  const results = await db
+    .promise()
+    .query(sql, [
+      card.SKU,
+      card.name,
+      card.text,
+      card.flavor,
+      parseInt(card.categoryId),
+      card.image,
+      parseInt(card.grade),
+      card.nation,
+      card.rarity,
+      card.race,
+      parseInt(card.critical),
+      card.illustrator,
+      parseInt(card.power),
+      card.regulation,
+      parseInt(card.shield),
+      card.skill,
+      card.triggerType,
+      card.type,
+      card_id]);
+
+  res.json(results[0]);
+  console.log(card);
+}
+
 
 
 exports.card_test = async (req, res) => {
