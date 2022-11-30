@@ -1,26 +1,29 @@
 const db = require("../database");
 
 exports.card_list = async (req, res) => {
+  const type = req.type;
   const results = await db
     .promise()
     .query(
-      `SELECT card.id, card.SKU AS SKU, card.name AS name, CONVERT (card.text USING utf8) AS text, card.flavor as flavor, category.name as category, category.category_description AS category_description, card.image AS image, card.grade AS grade, card.nation AS nation, card.rarity AS rarity, card.race AS race, card.critical AS critical, card.illustrator AS illustrator, card.power AS power, card.regulation AS regulation, card.shield AS shield, card.skill AS skill, card.trigger_type AS trigger_type, card.type AS type FROM card LEFT JOIN category USING(category_id)`
+      `SELECT c.id, c.SKU AS SKU, c.name AS name, CONVERT (c.text USING utf8) AS text, c.flavor as flavor, category.name as category, category.category_description AS category_description, c.image AS image, c.grade AS grade, c.nation AS nation, c.rarity AS rarity, c.race AS race, c.critical AS critical, c.illustrator AS illustrator, c.power AS power, c.regulation AS regulation, c.shield AS shield, c.skill AS skill, c.trigger_type AS trigger_type, c.type AS type FROM ${type}_cards AS c LEFT JOIN category USING(category_id)`
     );
   res.json(results[0]);
 };
 
 exports.card_detail = async (req, res) => {
+  const type = req.type;
   const card_id = req.params.id;
   const sql =
-    "SELECT card.id, card.SKU AS SKU, card.name AS name, CONVERT (card.text USING utf8) AS text, card.flavor as flavor, category.name AS category, category.category_description AS category_description, card.image AS image, card.grade AS grade, card.nation AS nation, card.rarity AS rarity, card.race AS race, card.critical AS critical, card.illustrator AS illustrator, card.power AS power, card.regulation AS regulation, card.shield AS shield, card.skill AS skill, card.trigger_type AS trigger_type, card.type AS type FROM card LEFT JOIN category USING(category_id) WHERE card.id = ?";
+    `SELECT c.id, c.SKU AS SKU, c.name AS name, CONVERT (c.text USING utf8) AS text, c.flavor as flavor, category.name AS category, category.category_description AS category_description, c.image AS image, c.grade AS grade, c.nation AS nation, c.rarity AS rarity, c.race AS race, c.critical AS critical, c.illustrator AS illustrator, c.power AS power, c.regulation AS regulation, c.shield AS shield, c.skill AS skill, c.trigger_type AS trigger_type, c.type AS type FROM ${type}_cards AS c LEFT JOIN category USING(category_id) WHERE c.id = ?`;
   const results = await db.promise().query(sql, card_id);
   res.json(results[0]);
 };
 
 exports.add_card = async (req, res) => {
+  const type = req.type;
   const card = req.body;
   const sql =
-    "INSERT INTO card (SKU, name, text, flavor, category_id, image, grade, nation, rarity, race, critical, illustrator, power, regulation, shield, skill, trigger_type, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    `INSERT INTO ${type}_cards (SKU, name, text, flavor, category_id, image, grade, nation, rarity, race, critical, illustrator, power, regulation, shield, skill, trigger_type, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
   const results = await db
     .promise()
     .query(sql, [
@@ -49,11 +52,46 @@ exports.add_card = async (req, res) => {
 };
 
 exports.delete_card = async (req, res) => {
+  const type = req.type;
   const card_id = req.params.id;
-  const sql = "DELETE FROM card WHERE id = ?";
+  const sql = `DELETE FROM ${type}_cards WHERE id = ?`;
   const results = await db.promise().query(sql, card_id);
   res.json(results[0]);
 };
+
+exports.edit_card = async (req, res) => {
+  const type = req.type;
+  const card = req.body;
+  const card_id = req.params.id;
+  console.log(card_id)
+  const sql =
+    `UPDATE ${type}_cards SET SKU = ?, name = ?, text = ?, flavor = ?, category_id = ?, image = ?, grade = ?, nation = ?, rarity = ?, race = ?, critical = ?, illustrator = ?, power = ?, regulation = ?, shield = ?, skill = ?, trigger_type = ?, type = ? WHERE id = ?`;
+  const results = await db
+    .promise()
+    .query(sql, [
+      card.SKU,
+      card.name,
+      card.text,
+      card.flavor,
+      parseInt(card.categoryId),
+      card.image,
+      parseInt(card.grade),
+      card.nation,
+      card.rarity,
+      card.race,
+      parseInt(card.critical),
+      card.illustrator,
+      parseInt(card.power),
+      card.regulation,
+      parseInt(card.shield),
+      card.skill,
+      card.triggerType,
+      card.type,
+      card_id]);
+
+  res.json(results[0]);
+  console.log(card);
+}
 
 exports.categoryId = async (req, res) => {
   const results = await db
@@ -87,39 +125,6 @@ exports.add_category = async (req, res) => {
   res.json(results[0]);
   console.log(category);
 };
-
-exports.edit_card = async (req, res) => {
-  const card = req.body;
-  const card_id = req.params.id;
-  console.log(card_id)
-  const sql =
-    "UPDATE card SET SKU = ?, name = ?, text = ?, flavor = ?, category_id = ?, image = ?, grade = ?, nation = ?, rarity = ?, race = ?, critical = ?, illustrator = ?, power = ?, regulation = ?, shield = ?, skill = ?, trigger_type = ?, type = ? WHERE id = ?";
-  const results = await db
-    .promise()
-    .query(sql, [
-      card.SKU,
-      card.name,
-      card.text,
-      card.flavor,
-      parseInt(card.categoryId),
-      card.image,
-      parseInt(card.grade),
-      card.nation,
-      card.rarity,
-      card.race,
-      parseInt(card.critical),
-      card.illustrator,
-      parseInt(card.power),
-      card.regulation,
-      parseInt(card.shield),
-      card.skill,
-      card.triggerType,
-      card.type,
-      card_id]);
-
-  res.json(results[0]);
-  console.log(card);
-}
 
 
 
