@@ -6,7 +6,6 @@ const bp = require('body-parser')
 router.use(bp.json())
 router.use(bp.urlencoded({ extended: true }))
 
-router.get("/test", card_controller.card_test);
 router.get("/categoryId", card_controller.categoryId)
 router.get("/category", card_controller.category)
 router.post("/addCategory",card_controller.add_category);
