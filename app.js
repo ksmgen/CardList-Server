@@ -1,20 +1,24 @@
 import express from "express";
 import cors from "cors";
 
+import cardRouter from "./routes/cardlist.routes";
+
 const app = express();
 const port = process.env.PORT || 3001;
 const db = require("./database");
 
 app.use(cors());
-app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+app.listen(port, () => console.log(`VGB CardList Server is listening on port ${port}!`));
 
-db.connect(function (err) {
+db.connect((err) => {
   if (err) throw err;
-  console.log("Connected!");
+  console.log("Connected to DB!");
 });
 
-const cardRouter = require("./routes/cardlist.routes");
-app.use("/cardlist", cardRouter);
+/**
+  * Routes
+  */
+ app.use("/", cardRouter);
 
 {
   /*
