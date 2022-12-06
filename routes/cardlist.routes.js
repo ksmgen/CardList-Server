@@ -1,23 +1,23 @@
-const express = require("express");
-const router = express.Router();
-const card_controller = require("../controllers/cardlist.controller");
-const bp = require('body-parser')
+import { Router } from "express";
+const router = Router();
+import { categoryId, category, add_category, card_list, card_detail, add_card, delete_card, edit_card } from "../controllers/cardlist.controller";
+import { json, urlencoded } from 'body-parser';
 
-router.use(bp.json())
-router.use(bp.urlencoded({ extended: true }))
+router.use(json())
+router.use(urlencoded({ extended: true }))
 
-router.get("/categoryId", card_controller.categoryId)
-router.get("/category", card_controller.category)
-router.post("/addCategory",card_controller.add_category);
+router.get("/categoryId", categoryId)
+router.get("/category", category)
+router.post("/addCategory",add_category);
 router.get("/:type", (req, res, next) => {
-    req.type = req.params.type; next();}, card_controller.card_list)
+    req.type = req.params.type; next();}, card_list)
 router.get("/:type/detail/:id", (req, res, next) => {
-    req.type = req.params.type; next();}, card_controller.card_detail)
+    req.type = req.params.type; next();}, card_detail)
 router.post("/:type/addCard", (req, res, next) => {
-    req.type = req.params.type; next();}, card_controller.add_card)
+    req.type = req.params.type; next();}, add_card)
 router.delete("/:type/delete/:id", (req, res, next) => {
-    req.type = req.params.type; next();}, card_controller.delete_card)
+    req.type = req.params.type; next();}, delete_card)
 router.put("/:type/editcard/:id", (req, res, next) => {
-    req.type = req.params.type; next();}, card_controller.edit_card)
+    req.type = req.params.type; next();}, edit_card)
 
-module.exports = router;
+export default router;
