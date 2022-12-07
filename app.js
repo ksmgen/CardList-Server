@@ -20,5 +20,5 @@ db.connect((err) => {
 /**
  * Routes
  */
-app.use("/", cardRouter);
+app.use("/cardlist", cardRouter);
 
