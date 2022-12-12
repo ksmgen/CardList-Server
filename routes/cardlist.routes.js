@@ -11,6 +11,7 @@ import {
   edit_card,
   find_card,
   card_list_pagination,
+  card_list_total_pages,
 } from "../controllers/cardlist.controller";
 import { json, urlencoded } from "body-parser";
 
@@ -29,12 +30,12 @@ router.get(
   card_list
 );
 router.get(
-  "/:type/:page",
+  "/:type/total_pages",
   (req, res, next) => {
     req.type = req.params.type;
     next();
   },
-  card_list_pagination
+  card_list_total_pages
 );
 router.get(
   "/:type/detail/:id",
@@ -67,6 +68,14 @@ router.put(
     next();
   },
   edit_card
+);
+router.get(
+  "/:type/:page",
+  (req, res, next) => {
+    req.type = req.params.type;
+    next();
+  },
+  card_list_pagination
 );
 router.get(
   "/:type/find/:keyword/:page",

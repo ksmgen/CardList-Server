@@ -22,11 +22,28 @@ exports.card_list_pagination = async (req, res) => {
     const results = await db
       .promise()
       .query(
-        `SELECT c.id, c.SKU AS SKU, c.name AS name, CONVERT (c.text USING utf8) AS text, c.flavor as flavor, category.name as category, category.category_description AS category_description, c.image AS image, c.grade AS grade, c.nation AS nation, c.rarity AS rarity, c.race AS race, c.critical AS critical, c.illustrator AS illustrator, c.power AS power, c.regulation AS regulation, c.shield AS shield, c.skill AS skill, c.trigger_type AS trigger_type, c.type AS type FROM ${type}_cards AS c LEFT JOIN category USING(category_id) LIMIT 3 OFFSET ${offset}`
+        ` SELECT  *
+          FROM    ${type}_cards AS c
+          LIMIT 50 OFFSET ${offset}`
       );
     res.json(results[0]);
   } catch (error) {
     console.log(error);
+  }
+};
+
+exports.card_list_total_pages = async (req, res) => {
+  try {
+    const type = req.type;
+    const results = await db
+      .promise()
+      .query(
+        ` SELECT  COUNT(*) as recNum
+          FROM    ${type}_cards`
+      );
+    res.json(Math.ceil(results[0][0]['recNum']/50));
+  } catch (error) {
+    res.json(0);
   }
 };
 
