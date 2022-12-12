@@ -19,14 +19,18 @@ exports.card_list_pagination = async (req, res) => {
     const type = req.type;
     const page = req.params.page;
     const offset = 50 * page - 50;
-    const results = await db
-      .promise()
-      .query(
-        ` SELECT  *
-          FROM    ${type}_cards AS c
-          LIMIT 50 OFFSET ${offset}`
-      );
-    res.json(results[0]);
+    const sqlCount = `  SELECT  COUNT(*) as recNum
+                        FROM    ${type}_cards`;
+    const sql = ` SELECT  *, CONVERT (text USING utf8) as text2
+                  FROM    ${type}_cards 
+                  ORDER BY id
+                  LIMIT 50 OFFSET ${offset}`;
+
+    const resultCount = await db.promise().query(sqlCount);
+    const results = await db.promise().query(sql);
+  
+    res.json({count:resultCount[0][0]['recNum'], cards:results[0]});
+    //res.json(results[0]);
   } catch (error) {
     console.log(error);
   }
@@ -196,7 +200,7 @@ exports.find_card = async (req, res) => {
                                   OR LOWER(nation) LIKE '%${keyword}%' 
                                   OR LOWER(race) LIKE '%${keyword}%' 
                                   OR LOWER(illustrator) LIKE '%${keyword}%'`;
-    const sql = ` SELECT  *
+    const sql = ` SELECT  *, CONVERT (text USING utf8) as text2
                   FROM    ${type}_cards 
                   WHERE   LOWER(SKU) LIKE '%${keyword}%' 
                             OR LOWER(name) LIKE '%${keyword}%' 
@@ -205,12 +209,13 @@ exports.find_card = async (req, res) => {
                             OR LOWER(nation) LIKE '%${keyword}%' 
                             OR LOWER(race) LIKE '%${keyword}%' 
                             OR LOWER(illustrator) LIKE '%${keyword}%' 
+                  ORDER BY id
                   LIMIT 50 OFFSET ${offset}`;
     
     const resultCount = await db.promise().query(sqlCount);
     const results = await db.promise().query(sql);
 
-    res.json({count:resultCount[0][0]['recNum'], results:results[0]});
+    res.json({count:resultCount[0][0]['recNum'], cards:results[0]});
   } catch (error) {
     console.log(error);
   }

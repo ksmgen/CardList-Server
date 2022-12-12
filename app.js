@@ -17,8 +17,15 @@ db.connect((err) => {
   console.log("Connected to DB!");
 });
 
+var interval = setInterval(async () => {
+  const testCon = await db.promise().query("SELECT 1");
+  //console.log(testCon[0]);
+}, 60000);
+
 /**
  * Routes
  */
 app.use("/cardlist", cardRouter);
+
+
 
