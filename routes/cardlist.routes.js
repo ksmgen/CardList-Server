@@ -70,20 +70,20 @@ router.put(
   edit_card
 );
 router.get(
-  "/:type/:page",
-  (req, res, next) => {
-    req.type = req.params.type;
-    next();
-  },
-  card_list_pagination
-);
-router.get(
   "/:type/find/:keyword/:page",
   (req, res, next) => {
     req.type = req.params.type;
     next();
   },
   find_card
+);
+router.get(
+  "/:type/:page",
+  (req, res, next) => {
+    req.type = req.params.type;
+    next();
+  },
+  card_list_pagination
 );
 
 export default router;

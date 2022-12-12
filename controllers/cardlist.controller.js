@@ -183,12 +183,34 @@ exports.add_category = async (req, res) => {
 exports.find_card = async (req, res) => {
   try {
     const type = req.type;
-    const keyword = decodeURI(req.params.keyword);
+    const keyword = decodeURI(req.params.keyword).toLowerCase();
     const page = req.params.page;
     const offset = page * 50 - 50;
-    const sql = `SELECT c.id, c.SKU AS SKU, c.name AS name, CONVERT (c.text USING utf8) AS text, c.flavor as flavor, category.name AS category, category.category_description AS category_description, c.image AS image, c.grade AS grade, c.nation AS nation, c.rarity AS rarity, c.race AS race, c.critical AS critical, c.illustrator AS illustrator, c.power AS power, c.regulation AS regulation, c.shield AS shield, c.skill AS skill, c.trigger_type AS trigger_type, c.type AS type FROM ${type}_cards_copy AS c LEFT JOIN category USING(category_id) WHERE c.name LIKE '%${keyword}%' OR CONVERT (c.text USING utf8) LIKE '%${keyword}%' OR c.flavor LIKE '%${keyword}%' LIMIT 50 OFFSET ${offset}`;
+
+    const sqlCount = `  SELECT  COUNT(*) as recNum
+                        FROM    ${type}_cards 
+                        WHERE   LOWER(SKU) LIKE '%${keyword}%' 
+                                  OR LOWER(name) LIKE '%${keyword}%' 
+                                  OR LOWER(CONVERT (text USING utf8)) LIKE '%${keyword}%' 
+                                  OR LOWER(flavor) LIKE '%${keyword}%' 
+                                  OR LOWER(nation) LIKE '%${keyword}%' 
+                                  OR LOWER(race) LIKE '%${keyword}%' 
+                                  OR LOWER(illustrator) LIKE '%${keyword}%'`;
+    const sql = ` SELECT  *
+                  FROM    ${type}_cards 
+                  WHERE   LOWER(SKU) LIKE '%${keyword}%' 
+                            OR LOWER(name) LIKE '%${keyword}%' 
+                            OR LOWER(CONVERT (text USING utf8)) LIKE '%${keyword}%' 
+                            OR LOWER(flavor) LIKE '%${keyword}%' 
+                            OR LOWER(nation) LIKE '%${keyword}%' 
+                            OR LOWER(race) LIKE '%${keyword}%' 
+                            OR LOWER(illustrator) LIKE '%${keyword}%' 
+                  LIMIT 50 OFFSET ${offset}`;
+    
+    const resultCount = await db.promise().query(sqlCount);
     const results = await db.promise().query(sql);
-    res.json(results[0]);
+
+    res.json({count:resultCount[0][0]['recNum'], results:results[0]});
   } catch (error) {
     console.log(error);
   }
