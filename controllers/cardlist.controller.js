@@ -14,12 +14,27 @@ exports.card_list = async (req, res) => {
   }
 };
 
+exports.card_list_pagination = async (req, res) => {
+  try {
+    const type = req.type;
+    const page = req.params.page;
+    const offset = 50 * page - 50;
+    const results = await db
+      .promise()
+      .query(
+        `SELECT c.id, c.SKU AS SKU, c.name AS name, CONVERT (c.text USING utf8) AS text, c.flavor as flavor, category.name as category, category.category_description AS category_description, c.image AS image, c.grade AS grade, c.nation AS nation, c.rarity AS rarity, c.race AS race, c.critical AS critical, c.illustrator AS illustrator, c.power AS power, c.regulation AS regulation, c.shield AS shield, c.skill AS skill, c.trigger_type AS trigger_type, c.type AS type FROM ${type}_cards AS c LEFT JOIN category USING(category_id) LIMIT 3 OFFSET ${offset}`
+      );
+    res.json(results[0]);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 exports.card_detail = async (req, res) => {
   try {
     const type = req.type;
     const card_id = req.params.id;
-    const sql =
-      `SELECT c.id, c.SKU AS SKU, c.name AS name, CONVERT (c.text USING utf8) AS text, c.flavor as flavor, category.name AS category, category.category_description AS category_description, c.image AS image, c.grade AS grade, c.nation AS nation, c.rarity AS rarity, c.race AS race, c.critical AS critical, c.illustrator AS illustrator, c.power AS power, c.regulation AS regulation, c.shield AS shield, c.skill AS skill, c.trigger_type AS trigger_type, c.type AS type FROM ${type}_cards AS c LEFT JOIN category USING(category_id) WHERE c.id = ?`;
+    const sql = `SELECT c.id, c.SKU AS SKU, c.name AS name, CONVERT (c.text USING utf8) AS text, c.flavor as flavor, category.name AS category, category.category_description AS category_description, c.image AS image, c.grade AS grade, c.nation AS nation, c.rarity AS rarity, c.race AS race, c.critical AS critical, c.illustrator AS illustrator, c.power AS power, c.regulation AS regulation, c.shield AS shield, c.skill AS skill, c.trigger_type AS trigger_type, c.type AS type FROM ${type}_cards AS c LEFT JOIN category USING(category_id) WHERE c.id = ?`;
     const results = await db.promise().query(sql, card_id);
     res.json(results[0]);
   } catch (error) {
@@ -31,8 +46,7 @@ exports.add_card = async (req, res) => {
   try {
     const type = req.type;
     const card = req.body;
-    const sql =
-      `INSERT INTO ${type}_cards (SKU, name, text, flavor, category_id, image, grade, nation, rarity, race, critical, illustrator, power, regulation, shield, skill, trigger_type, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    const sql = `INSERT INTO ${type}_cards (SKU, name, text, flavor, category_id, image, grade, nation, rarity, race, critical, illustrator, power, regulation, shield, skill, trigger_type, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
     const results = await db
       .promise()
       .query(sql, [
@@ -55,7 +69,7 @@ exports.add_card = async (req, res) => {
         card.triggerType,
         card.type,
       ]);
-    
+
     res.json(results[0]);
     console.log(card);
   } catch (error) {
@@ -80,9 +94,8 @@ exports.edit_card = async (req, res) => {
     const type = req.type;
     const card = req.body;
     const card_id = req.params.id;
-    console.log(card_id)
-    const sql =
-      `UPDATE ${type}_cards SET SKU = ?, name = ?, text = ?, flavor = ?, category_id = ?, image = ?, grade = ?, nation = ?, rarity = ?, race = ?, critical = ?, illustrator = ?, power = ?, regulation = ?, shield = ?, skill = ?, trigger_type = ?, type = ? WHERE id = ?`;
+    console.log(card_id);
+    const sql = `UPDATE ${type}_cards SET SKU = ?, name = ?, text = ?, flavor = ?, category_id = ?, image = ?, grade = ?, nation = ?, rarity = ?, race = ?, critical = ?, illustrator = ?, power = ?, regulation = ?, shield = ?, skill = ?, trigger_type = ?, type = ? WHERE id = ?`;
     const results = await db
       .promise()
       .query(sql, [
@@ -104,22 +117,21 @@ exports.edit_card = async (req, res) => {
         card.skill,
         card.triggerType,
         card.type,
-        card_id]);
+        card_id,
+      ]);
 
     res.json(results[0]);
     console.log(card);
   } catch (error) {
     console.log(error);
   }
-}
+};
 
 exports.categoryId = async (req, res) => {
   try {
     const results = await db
       .promise()
-      .query(
-        `SELECT category_id FROM category`
-      );
+      .query(`SELECT category_id FROM category`);
     res.json(results[0]);
   } catch (error) {
     console.log(error);
@@ -128,11 +140,7 @@ exports.categoryId = async (req, res) => {
 
 exports.category = async (req, res) => {
   try {
-    const results = await db
-      .promise()
-      .query(
-        `SELECT * FROM category`
-      );
+    const results = await db.promise().query(`SELECT * FROM category`);
     res.json(results[0]);
   } catch (error) {
     console.log(error);
@@ -146,13 +154,24 @@ exports.add_category = async (req, res) => {
       "INSERT INTO category (name, category_description) VALUES (?, ?)";
     const results = await db
       .promise()
-      .query(sql, [
-        category.name,
-        category.description,
-      ]);
+      .query(sql, [category.name, category.description]);
 
     res.json(results[0]);
-  console.log(category);
+    console.log(category);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+exports.find_card = async (req, res) => {
+  try {
+    const type = req.type;
+    const keyword = decodeURI(req.params.keyword);
+    const page = req.params.page;
+    const offset = page * 50 - 50;
+    const sql = `SELECT c.id, c.SKU AS SKU, c.name AS name, CONVERT (c.text USING utf8) AS text, c.flavor as flavor, category.name AS category, category.category_description AS category_description, c.image AS image, c.grade AS grade, c.nation AS nation, c.rarity AS rarity, c.race AS race, c.critical AS critical, c.illustrator AS illustrator, c.power AS power, c.regulation AS regulation, c.shield AS shield, c.skill AS skill, c.trigger_type AS trigger_type, c.type AS type FROM ${type}_cards_copy AS c LEFT JOIN category USING(category_id) WHERE c.name LIKE '%${keyword}%' OR CONVERT (c.text USING utf8) LIKE '%${keyword}%' OR c.flavor LIKE '%${keyword}%' LIMIT 50 OFFSET ${offset}`;
+    const results = await db.promise().query(sql);
+    res.json(results[0]);
   } catch (error) {
     console.log(error);
   }
