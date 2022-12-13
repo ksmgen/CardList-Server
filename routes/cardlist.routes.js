@@ -10,6 +10,7 @@ import {
   delete_card,
   edit_card,
   find_card,
+  find_card2,
   card_list_pagination,
   card_list_total_pages,
 } from "../controllers/cardlist.controller";
@@ -68,6 +69,14 @@ router.put(
     next();
   },
   edit_card
+);
+router.get(
+  "/:type/find/:keyword/:page/:param",
+  (req, res, next) => {
+    req.type = req.params.type;
+    next();
+  },
+  find_card2
 );
 router.get(
   "/:type/find/:keyword/:page",

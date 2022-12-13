@@ -28,8 +28,8 @@ exports.card_list_pagination = async (req, res) => {
 
     const resultCount = await db.promise().query(sqlCount);
     const results = await db.promise().query(sql);
-  
-    res.json({count:resultCount[0][0]['recNum'], cards:results[0]});
+
+    res.json({ count: resultCount[0][0]['recNum'], cards: results[0] });
     //res.json(results[0]);
   } catch (error) {
     console.log(error);
@@ -45,7 +45,7 @@ exports.card_list_total_pages = async (req, res) => {
         ` SELECT  COUNT(*) as recNum
           FROM    ${type}_cards`
       );
-    res.json(Math.ceil(results[0][0]['recNum']/50));
+    res.json(Math.ceil(results[0][0]['recNum'] / 50));
   } catch (error) {
     res.json(0);
   }
@@ -211,12 +211,53 @@ exports.find_card = async (req, res) => {
                             OR LOWER(illustrator) LIKE '%${keyword}%' 
                   ORDER BY id
                   LIMIT 50 OFFSET ${offset}`;
-    
+
     const resultCount = await db.promise().query(sqlCount);
     const results = await db.promise().query(sql);
 
-    res.json({count:resultCount[0][0]['recNum'], cards:results[0]});
+    res.json({ count: resultCount[0][0]['recNum'], cards: results[0] });
   } catch (error) {
     console.log(error);
   }
-};
+}
+
+exports.find_card2 = async (req, res) => {
+  try {
+    const type = req.type;
+    const keyword = decodeURI(req.params.keyword).toLowerCase();
+    const param = req.params.param;
+    const page = req.params.page;
+    const offset = page * 50 - 50;
+
+    let sqlCount = `  SELECT  COUNT(*) as recNum
+                      FROM    ${type}_cards 
+                      WHERE   FALSE `;
+    let sqlFind = `  SELECT  *, CONVERT (text USING utf8) as text2
+                      FROM    ${type}_cards 
+                      WHERE   FALSE `;
+
+    if (param.includes("name")) {
+      sqlCount += `OR LOWER(name) LIKE '%${keyword}%'`;
+      sqlFind += `OR LOWER(name) LIKE '%${keyword}%'`;
+    }
+
+    if (param.includes("text")) {
+      sqlCount += `OR LOWER(CONVERT (text USING utf8)) LIKE '%${keyword}%' `;
+      sqlFind += `OR LOWER(CONVERT (text USING utf8)) LIKE '%${keyword}%' `;
+    }
+
+    if (param.includes("nation")) {
+      sqlCount += `OR LOWER(nation) LIKE '%${keyword}%' `;
+      sqlFind += `OR LOWER(nation) LIKE '%${keyword}%' `;
+    }
+
+    sqlFind += `ORDER BY id LIMIT 50 OFFSET ${offset}`;
+
+    const resultCount = await db.promise().query(sqlCount);
+    const results = await db.promise().query(sqlFind);
+
+    res.json({ count: resultCount[0][0]['recNum'], cards: results[0] });
+  } catch (error) {
+    console.log(error);
+  }
+}
