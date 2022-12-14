@@ -14,7 +14,8 @@ import {
   card_list_pagination,
   card_list_total_pages,
   get_random_card,
-  get_set_card
+  get_set_card,
+  find_card_with_filter
 } from "../controllers/cardlist.controller";
 import { json, urlencoded } from "body-parser";
 
@@ -97,6 +98,7 @@ router.get(
   },
   get_set_card
 );
+/*
 router.get(
   "/:type/find/:keyword/:page",
   (req, res, next) => {
@@ -105,6 +107,7 @@ router.get(
   },
   find_card
 );
+*/
 router.get(
   "/:type/:page",
   (req, res, next) => {
@@ -114,4 +117,13 @@ router.get(
   card_list_pagination
 );
 
+// /oracle/find/1/name,text,nation?keyword=&set=&nation=&type=
+router.get(
+  "/:type/find/:page/:paramChecked",
+  (req, res, next) => {
+    req.type = req.params.type;
+    next();
+  },
+  find_card_with_filter
+);
 export default router;

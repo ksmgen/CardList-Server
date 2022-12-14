@@ -301,3 +301,70 @@ exports.get_set_card = async (req, res) => {
     console.log(error);
   }
 };
+
+exports.find_card_with_filter = async (req, res) => {
+  try {
+    const type = req.type;
+    const keyword = req.query.keyword
+    const paramChecked = req.params.paramChecked;
+    const nation= req.query.nation;
+    const set = req.query.set;
+    const card_type = req.query.type;
+    const page = req.params.page;
+    const offset = page * 50 - 50;
+
+    let sqlCount = `  SELECT  COUNT(*) as recNum
+                      FROM    ${type}_cards 
+                      WHERE   TRUE `;
+    let sqlFind = `  SELECT  *, CONVERT (text USING utf8) as text2
+                      FROM    ${type}_cards 
+                      WHERE   TRUE `;
+    
+    if (nation) {
+      sqlCount += `AND nation = '${nation}' `;
+      sqlFind += `AND nation = '${nation}' `;
+    }
+
+    if (set) {
+      sqlCount += `AND category LIKE '%${set}%' `;
+      sqlFind += `AND category LIKE '%${set}%' `;
+    }
+
+    if (card_type) {
+      sqlCount += `AND type = '${card_type}' `;
+      sqlFind += `AND type = '${card_type}' `;
+    }
+
+    sqlCount += `AND ( FALSE `;
+    sqlFind += `AND ( FALSE `;
+
+    if (paramChecked.includes("name")) {
+      sqlCount += `OR LOWER(name) LIKE '%${keyword}%' `;
+      sqlFind += `OR LOWER(name) LIKE '%${keyword}%' `;
+    }
+
+    if (paramChecked.includes("text")) {
+      sqlCount += `OR LOWER(CONVERT (text USING utf8)) LIKE '%${keyword}%' `;
+      sqlFind += `OR LOWER(CONVERT (text USING utf8)) LIKE '%${keyword}%' `;
+    }
+
+    if (paramChecked.includes("nation")) {
+      sqlCount += `OR LOWER(nation) LIKE '%${keyword}%' `;
+      sqlFind += `OR LOWER(nation) LIKE '%${keyword}%' `;
+    }
+
+    sqlCount += `) `;
+    sqlFind += `) `;
+
+    sqlFind += `ORDER BY id LIMIT 50 OFFSET ${offset}`;
+
+    const resultCount = await db.promise().query(sqlCount);
+    const results = await db.promise().query(sqlFind);
+
+    console.log(sqlFind)
+
+    res.json({ count: resultCount[0][0]['recNum'], cards: results[0] });
+  } catch (error) {
+    console.log(error);
+  }
+}
