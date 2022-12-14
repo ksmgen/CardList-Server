@@ -261,3 +261,19 @@ exports.find_card2 = async (req, res) => {
     console.log(error);
   }
 }
+
+exports.get_random_card = async (req, res) => {
+  try {
+    const type = req.type;
+    const sql = ` SELECT  *, CONVERT (text USING utf8) as text2
+                  FROM    ${type}_cards 
+                  ORDER BY RAND ( )  
+                  LIMIT 1`;
+
+    const result = await db.promise().query(sql);
+
+    res.json({ count: 1, card: result[0] });
+  } catch (error) {
+    console.log(error);
+  }
+};

@@ -13,6 +13,7 @@ import {
   find_card2,
   card_list_pagination,
   card_list_total_pages,
+  get_random_card
 } from "../controllers/cardlist.controller";
 import { json, urlencoded } from "body-parser";
 
@@ -69,6 +70,15 @@ router.put(
     next();
   },
   edit_card
+);
+
+router.get(
+  "/:type/random",
+  (req, res, next) => {
+    req.type = req.params.type;
+    next();
+  },
+  get_random_card
 );
 router.get(
   "/:type/find/:keyword/:page/:param",
