@@ -277,3 +277,27 @@ exports.get_random_card = async (req, res) => {
     console.log(error);
   }
 };
+
+exports.get_set_card = async (req, res) => {
+  try {
+    const type = req.type;
+    const keyword = decodeURI(req.params.keyword).toLowerCase();
+    const page = req.params.page;
+    const offset = page * 50 - 50;
+    const sqlc = ` SELECT  COUNT(*) as recNum
+                  FROM    ${type}_cards 
+                  WHERE   LOWER(category) LIKE '%${keyword}%'`;
+    const sql = ` SELECT  *, CONVERT (text USING utf8) as text2
+                  FROM    ${type}_cards 
+                  WHERE   LOWER(category) LIKE '%${keyword}%'
+                  ORDER BY id
+                  LIMIT 50 OFFSET ${offset}`;
+
+    const resultc = await db.promise().query(sqlc);
+    const result = await db.promise().query(sql);
+
+    res.json({ count: resultc[0][0]['recNum'], cards: result[0] });
+  } catch (error) {
+    console.log(error);
+  }
+};

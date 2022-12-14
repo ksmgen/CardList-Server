@@ -13,7 +13,8 @@ import {
   find_card2,
   card_list_pagination,
   card_list_total_pages,
-  get_random_card
+  get_random_card,
+  get_set_card
 } from "../controllers/cardlist.controller";
 import { json, urlencoded } from "body-parser";
 
@@ -87,6 +88,14 @@ router.get(
     next();
   },
   find_card2
+);
+router.get(
+  "/:type/findset/:keyword/:page",
+  (req, res, next) => {
+    req.type = req.params.type;
+    next();
+  },
+  get_set_card
 );
 router.get(
   "/:type/find/:keyword/:page",
