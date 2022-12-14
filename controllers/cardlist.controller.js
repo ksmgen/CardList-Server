@@ -1,12 +1,12 @@
 const db = require("../database");
 
-exports.card_list = async (req, res) => {
+exports.card_list_home = async (req, res) => {
   try {
     const type = req.type;
     const results = await db
       .promise()
       .query(
-        `SELECT c.id, c.SKU AS SKU, c.name AS name, CONVERT (c.text USING utf8) AS text, c.flavor as flavor, category.name as category, category.category_description AS category_description, c.image AS image, c.grade AS grade, c.nation AS nation, c.rarity AS rarity, c.race AS race, c.critical AS critical, c.illustrator AS illustrator, c.power AS power, c.regulation AS regulation, c.shield AS shield, c.skill AS skill, c.trigger_type AS trigger_type, c.type AS type FROM ${type}_cards AS c LEFT JOIN category USING(category_id)`
+        `SELECT id, SKU, name, CONVERT (text USING utf8) AS text, flavor, category, image, grade, nation, rarity, race, critical, illustrator, power, regulation, shield, skill, trigger_text, type FROM ${type}_cards_duplicate ORDER BY last_update LIMIT 9`
       );
     res.json(results[0]);
   } catch (error) {
@@ -29,7 +29,7 @@ exports.card_list_pagination = async (req, res) => {
     const resultCount = await db.promise().query(sqlCount);
     const results = await db.promise().query(sql);
 
-    res.json({ count: resultCount[0][0]['recNum'], cards: results[0] });
+    res.json({ count: resultCount[0][0]["recNum"], cards: results[0] });
     //res.json(results[0]);
   } catch (error) {
     console.log(error);
@@ -39,13 +39,11 @@ exports.card_list_pagination = async (req, res) => {
 exports.card_list_total_pages = async (req, res) => {
   try {
     const type = req.type;
-    const results = await db
-      .promise()
-      .query(
-        ` SELECT  COUNT(*) as recNum
+    const results = await db.promise().query(
+      ` SELECT  COUNT(*) as recNum
           FROM    ${type}_cards`
-      );
-    res.json(Math.ceil(results[0][0]['recNum'] / 50));
+    );
+    res.json(Math.ceil(results[0][0]["recNum"] / 50));
   } catch (error) {
     res.json(0);
   }
@@ -55,7 +53,7 @@ exports.card_detail = async (req, res) => {
   try {
     const type = req.type;
     const card_id = req.params.id;
-    const sql = `SELECT c.id, c.SKU AS SKU, c.name AS name, CONVERT (c.text USING utf8) AS text, c.flavor as flavor, category.name AS category, category.category_description AS category_description, c.image AS image, c.grade AS grade, c.nation AS nation, c.rarity AS rarity, c.race AS race, c.critical AS critical, c.illustrator AS illustrator, c.power AS power, c.regulation AS regulation, c.shield AS shield, c.skill AS skill, c.trigger_type AS trigger_type, c.type AS type FROM ${type}_cards AS c LEFT JOIN category USING(category_id) WHERE c.id = ?`;
+    const sql = `SELECT id, SKU, name, CONVERT (text USING utf8) AS text, flavor, category, image, grade, nation, rarity, race, critical, illustrator, power, regulation, shield, skill, trigger_text, type FROM ${type}_cards_duplicate WHERE id = ?`;
     const results = await db.promise().query(sql, card_id);
     res.json(results[0]);
   } catch (error) {
@@ -67,7 +65,7 @@ exports.add_card = async (req, res) => {
   try {
     const type = req.type;
     const card = req.body;
-    const sql = `INSERT INTO ${type}_cards (SKU, name, text, flavor, category_id, image, grade, nation, rarity, race, critical, illustrator, power, regulation, shield, skill, trigger_type, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    const sql = `INSERT INTO ${type}_cards_duplicate (SKU, name, text, flavor, category_id, image, grade, nation, rarity, race, critical, illustrator, power, regulation, shield, skill, trigger_text, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
     const results = await db
       .promise()
       .query(sql, [
@@ -116,7 +114,7 @@ exports.edit_card = async (req, res) => {
     const card = req.body;
     const card_id = req.params.id;
     console.log(card_id);
-    const sql = `UPDATE ${type}_cards SET SKU = ?, name = ?, text = ?, flavor = ?, category_id = ?, image = ?, grade = ?, nation = ?, rarity = ?, race = ?, critical = ?, illustrator = ?, power = ?, regulation = ?, shield = ?, skill = ?, trigger_type = ?, type = ? WHERE id = ?`;
+    const sql = `UPDATE ${type}_cards_duplicate SET SKU = ?, name = ?, text = ?, flavor = ?, category_id = ?, image = ?, grade = ?, nation = ?, rarity = ?, race = ?, critical = ?, illustrator = ?, power = ?, regulation = ?, shield = ?, skill = ?, trigger_text = ?, type = ? WHERE id = ?`;
     const results = await db
       .promise()
       .query(sql, [
@@ -215,11 +213,11 @@ exports.find_card = async (req, res) => {
     const resultCount = await db.promise().query(sqlCount);
     const results = await db.promise().query(sql);
 
-    res.json({ count: resultCount[0][0]['recNum'], cards: results[0] });
+    res.json({ count: resultCount[0][0]["recNum"], cards: results[0] });
   } catch (error) {
     console.log(error);
   }
-}
+};
 
 exports.find_card2 = async (req, res) => {
   try {
@@ -256,8 +254,8 @@ exports.find_card2 = async (req, res) => {
     const resultCount = await db.promise().query(sqlCount);
     const results = await db.promise().query(sqlFind);
 
-    res.json({ count: resultCount[0][0]['recNum'], cards: results[0] });
+    res.json({ count: resultCount[0][0]["recNum"], cards: results[0] });
   } catch (error) {
     console.log(error);
   }
-}
+};

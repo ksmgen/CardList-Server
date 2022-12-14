@@ -4,7 +4,6 @@ import {
   categoryId,
   category,
   add_category,
-  card_list,
   card_detail,
   add_card,
   delete_card,
@@ -13,6 +12,7 @@ import {
   find_card2,
   card_list_pagination,
   card_list_total_pages,
+  card_list_home,
 } from "../controllers/cardlist.controller";
 import { json, urlencoded } from "body-parser";
 
@@ -23,12 +23,12 @@ router.get("/categoryId", categoryId);
 router.get("/category", category);
 router.post("/addCategory", add_category);
 router.get(
-  "/:type",
+  "/:type/home",
   (req, res, next) => {
     req.type = req.params.type;
     next();
   },
-  card_list
+  card_list_home
 );
 router.get(
   "/:type/total_pages",
