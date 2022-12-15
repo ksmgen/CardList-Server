@@ -308,6 +308,7 @@ exports.find_card_with_filter = async (req, res) => {
     const keyword = req.query.keyword
     const paramChecked = req.params.paramChecked;
     const nation= req.query.nation;
+    const orderBy= req.query.orderBy;
     const set = req.query.set;
     const card_type = req.query.type;
     const page = req.params.page;
@@ -356,8 +357,13 @@ exports.find_card_with_filter = async (req, res) => {
     sqlCount += `) `;
     sqlFind += `) `;
 
-    sqlFind += `ORDER BY id LIMIT 50 OFFSET ${offset}`;
+    if (orderBy) {
+      sqlFind += `ORDER BY ${orderBy.toLowerCase()} LIMIT 50 OFFSET ${offset}`;
+    } else {
+      sqlFind += `ORDER BY id LIMIT 50 OFFSET ${offset}`;
+    }
 
+  
     const resultCount = await db.promise().query(sqlCount);
     const results = await db.promise().query(sqlFind);
 
