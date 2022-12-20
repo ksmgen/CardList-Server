@@ -61,11 +61,22 @@ exports.card_detail = async (req, res) => {
   }
 };
 
+exports.card_category = async (req, res) => {
+  try {
+    const type = req.type;
+    const sql = `SELECT DISTINCT category FROM ${type}_cards_duplicate`;
+    const results = await db.promise().query(sql);
+    res.json(results[0]);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 exports.add_card = async (req, res) => {
   try {
     const type = req.type;
     const card = req.body;
-    const sql = `INSERT INTO ${type}_cards_duplicate (SKU, name, text, flavor, category_id, image, grade, nation, rarity, race, critical, illustrator, power, regulation, shield, skill, trigger_text, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    const sql = `INSERT INTO ${type}_cards_duplicate (SKU, name, text, flavor, category, image, grade, nation, rarity, race, critical, illustrator, power, regulation, shield, skill, trigger_text, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
     const results = await db
       .promise()
       .query(sql, [
@@ -73,7 +84,7 @@ exports.add_card = async (req, res) => {
         card.name,
         card.text,
         card.flavor,
-        parseInt(card.categoryId),
+        card.category,
         card.image,
         parseInt(card.grade),
         card.nation,
@@ -114,7 +125,7 @@ exports.edit_card = async (req, res) => {
     const card = req.body;
     const card_id = req.params.id;
     console.log(card_id);
-    const sql = `UPDATE ${type}_cards_duplicate SET SKU = ?, name = ?, text = ?, flavor = ?, category_id = ?, image = ?, grade = ?, nation = ?, rarity = ?, race = ?, critical = ?, illustrator = ?, power = ?, regulation = ?, shield = ?, skill = ?, trigger_text = ?, type = ? WHERE id = ?`;
+    const sql = `UPDATE ${type}_cards_duplicate SET SKU = ?, name = ?, text = ?, flavor = ?, category = ?, image = ?, grade = ?, nation = ?, rarity = ?, race = ?, critical = ?, illustrator = ?, power = ?, regulation = ?, shield = ?, skill = ?, trigger_text = ?, type = ? WHERE id = ?`;
     const results = await db
       .promise()
       .query(sql, [
@@ -122,7 +133,7 @@ exports.edit_card = async (req, res) => {
         card.name,
         card.text,
         card.flavor,
-        parseInt(card.categoryId),
+        card.category,
         card.image,
         parseInt(card.grade),
         card.nation,

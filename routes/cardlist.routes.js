@@ -10,6 +10,7 @@ import {
   edit_card,
   find_card,
   find_card2,
+  card_category,
   card_list_pagination,
   card_list_total_pages,
   card_list_home,
@@ -46,6 +47,14 @@ router.get(
   },
   card_detail
 );
+router.get(
+  "/:type/category",
+  (req, res, next) => {
+    req.type = req.params.type;
+    next();
+  },
+  card_category
+)
 router.post(
   "/:type/addCard",
   (req, res, next) => {
