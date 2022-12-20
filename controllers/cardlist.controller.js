@@ -201,7 +201,7 @@ exports.find_card = async (req, res) => {
     const offset = page * 50 - 50;
 
     const sqlCount = `  SELECT  COUNT(*) as recNum
-                        FROM    ${type}_cards 
+                        FROM    ${type}_cards_duplicate 
                         WHERE   LOWER(SKU) LIKE '%${keyword}%' 
                                   OR LOWER(name) LIKE '%${keyword}%' 
                                   OR LOWER(CONVERT (text USING utf8)) LIKE '%${keyword}%' 
@@ -210,7 +210,7 @@ exports.find_card = async (req, res) => {
                                   OR LOWER(race) LIKE '%${keyword}%' 
                                   OR LOWER(illustrator) LIKE '%${keyword}%'`;
     const sql = ` SELECT  *, CONVERT (text USING utf8) as text2
-                  FROM    ${type}_cards 
+                  FROM    ${type}_cards_duplicate 
                   WHERE   LOWER(SKU) LIKE '%${keyword}%' 
                             OR LOWER(name) LIKE '%${keyword}%' 
                             OR LOWER(CONVERT (text USING utf8)) LIKE '%${keyword}%' 
@@ -239,10 +239,10 @@ exports.find_card2 = async (req, res) => {
     const offset = page * 50 - 50;
 
     let sqlCount = `  SELECT  COUNT(*) as recNum
-                      FROM    ${type}_cards 
+                      FROM    ${type}_cards_duplicate 
                       WHERE   FALSE `;
     let sqlFind = `  SELECT  *, CONVERT (text USING utf8) as text2
-                      FROM    ${type}_cards 
+                      FROM    ${type}_cards_duplicate 
                       WHERE   FALSE `;
 
     if (param.includes("name")) {
@@ -275,7 +275,7 @@ exports.get_random_card = async (req, res) => {
   try {
     const type = req.type;
     const sql = ` SELECT  *, CONVERT (text USING utf8) as text2
-                  FROM    ${type}_cards 
+                  FROM    ${type}_cards_duplicate 
                   ORDER BY RAND ( )  
                   LIMIT 1`;
 
@@ -294,10 +294,10 @@ exports.get_set_card = async (req, res) => {
     const page = req.params.page;
     const offset = page * 50 - 50;
     const sqlc = ` SELECT  COUNT(*) as recNum
-                  FROM    ${type}_cards 
+                  FROM    ${type}_cards_duplicate 
                   WHERE   LOWER(category) LIKE '%${keyword}%'`;
     const sql = ` SELECT  *, CONVERT (text USING utf8) as text2
-                  FROM    ${type}_cards 
+                  FROM    ${type}_cards_duplicate 
                   WHERE   LOWER(category) LIKE '%${keyword}%'
                   ORDER BY id
                   LIMIT 50 OFFSET ${offset}`;
@@ -324,10 +324,10 @@ exports.find_card_with_filter = async (req, res) => {
     const offset = page * 50 - 50;
 
     let sqlCount = `  SELECT  COUNT(*) as recNum
-                      FROM    ${type}_cards 
+                      FROM    ${type}_cards_duplicate 
                       WHERE   TRUE `;
     let sqlFind = `  SELECT  *, CONVERT (text USING utf8) as text2
-                      FROM    ${type}_cards 
+                      FROM    ${type}_cards_duplicate 
                       WHERE   TRUE `;
 
     if (nation) {
