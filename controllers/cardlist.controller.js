@@ -96,7 +96,7 @@ exports.add_card = async (req, res) => {
         card.regulation,
         parseInt(card.shield),
         card.skill,
-        card.trigger_text,
+        card.triggerText,
         card.type,
       ]);
 
@@ -145,7 +145,7 @@ exports.edit_card = async (req, res) => {
         card.regulation,
         parseInt(card.shield),
         card.skill,
-        card.trigger_text,
+        card.triggerText,
         card.type,
         card_id,
       ]);
