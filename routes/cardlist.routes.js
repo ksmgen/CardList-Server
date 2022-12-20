@@ -1,9 +1,11 @@
 import { Router } from "express";
 const router = Router();
 import {
+  card_list_home,
   categoryId,
   category,
   add_category,
+  card_category,
   card_list,
   card_detail,
   add_card,
@@ -15,7 +17,7 @@ import {
   card_list_total_pages,
   get_random_card,
   get_set_card,
-  find_card_with_filter
+  find_card_with_filter,
 } from "../controllers/cardlist.controller";
 import { json, urlencoded } from "body-parser";
 
@@ -25,14 +27,16 @@ router.use(urlencoded({ extended: true }));
 router.get("/categoryId", categoryId);
 router.get("/category", category);
 router.post("/addCategory", add_category);
+
 router.get(
-  "/:type",
+  "/:type/home",
   (req, res, next) => {
     req.type = req.params.type;
     next();
   },
-  card_list
+  card_list_home
 );
+
 router.get(
   "/:type/total_pages",
   (req, res, next) => {
@@ -41,6 +45,7 @@ router.get(
   },
   card_list_total_pages
 );
+
 router.get(
   "/:type/detail/:id",
   (req, res, next) => {
@@ -49,6 +54,16 @@ router.get(
   },
   card_detail
 );
+
+router.get(
+  "/:type/category",
+  (req, res, next) => {
+    req.type = req.params.type;
+    next();
+  },
+  card_category
+);
+
 router.post(
   "/:type/addCard",
   (req, res, next) => {
@@ -57,6 +72,7 @@ router.post(
   },
   add_card
 );
+
 router.delete(
   "/:type/delete/:id",
   (req, res, next) => {
@@ -65,6 +81,7 @@ router.delete(
   },
   delete_card
 );
+
 router.put(
   "/:type/editcard/:id",
   (req, res, next) => {
@@ -82,6 +99,7 @@ router.get(
   },
   get_random_card
 );
+
 router.get(
   "/:type/find/:keyword/:page/:param",
   (req, res, next) => {
@@ -90,6 +108,7 @@ router.get(
   },
   find_card2
 );
+
 router.get(
   "/:type/findset/:keyword/:page",
   (req, res, next) => {
