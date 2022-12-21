@@ -20,9 +20,9 @@ exports.card_list_pagination = async (req, res) => {
     const page = req.params.page;
     const offset = 50 * page - 50;
     const sqlCount = `  SELECT  COUNT(*) as recNum
-                        FROM    ${type}_cards`;
+                        FROM    ${type}_cards_dev`;
     const sql = ` SELECT  *, CONVERT (text USING utf8) as text2
-                  FROM    ${type}_cards 
+                  FROM    ${type}_cards_dev 
                   ORDER BY id
                   LIMIT 50 OFFSET ${offset}`;
 
@@ -41,7 +41,7 @@ exports.card_list_total_pages = async (req, res) => {
     const type = req.type;
     const results = await db.promise().query(
       ` SELECT  COUNT(*) as recNum
-          FROM    ${type}_cards`
+          FROM    ${type}_cards_dev`
     );
     res.json(Math.ceil(results[0][0]["recNum"] / 50));
   } catch (error) {
@@ -111,7 +111,7 @@ exports.delete_card = async (req, res) => {
   try {
     const type = req.type;
     const card_id = req.params.id;
-    const sql = `DELETE FROM ${type}_cards WHERE id = ?`;
+    const sql = `DELETE FROM ${type}_cards_dev WHERE id = ?`;
     const results = await db.promise().query(sql, card_id);
     res.json(results[0]);
   } catch (error) {
@@ -201,7 +201,7 @@ exports.find_card = async (req, res) => {
     const offset = page * 50 - 50;
 
     const sqlCount = `  SELECT  COUNT(*) as recNum
-                        FROM    ${type}_cards 
+                        FROM    ${type}_cards_dev 
                         WHERE   LOWER(SKU) LIKE '%${keyword}%' 
                                   OR LOWER(name) LIKE '%${keyword}%' 
                                   OR LOWER(CONVERT (text USING utf8)) LIKE '%${keyword}%' 
@@ -210,7 +210,7 @@ exports.find_card = async (req, res) => {
                                   OR LOWER(race) LIKE '%${keyword}%' 
                                   OR LOWER(illustrator) LIKE '%${keyword}%'`;
     const sql = ` SELECT  *, CONVERT (text USING utf8) as text2
-                  FROM    ${type}_cards 
+                  FROM    ${type}_cards_dev 
                   WHERE   LOWER(SKU) LIKE '%${keyword}%' 
                             OR LOWER(name) LIKE '%${keyword}%' 
                             OR LOWER(CONVERT (text USING utf8)) LIKE '%${keyword}%' 
@@ -239,10 +239,10 @@ exports.find_card2 = async (req, res) => {
     const offset = page * 50 - 50;
 
     let sqlCount = `  SELECT  COUNT(*) as recNum
-                      FROM    ${type}_cards 
+                      FROM    ${type}_cards_dev 
                       WHERE   FALSE `;
     let sqlFind = `  SELECT  *, CONVERT (text USING utf8) as text2
-                      FROM    ${type}_cards 
+                      FROM    ${type}_cards_dev 
                       WHERE   FALSE `;
 
     if (param.includes("name")) {
@@ -275,7 +275,7 @@ exports.get_random_card = async (req, res) => {
   try {
     const type = req.type;
     const sql = ` SELECT  *, CONVERT (text USING utf8) as text2
-                  FROM    ${type}_cards 
+                  FROM    ${type}_cards_dev 
                   ORDER BY RAND ( )  
                   LIMIT 1`;
 
@@ -294,10 +294,10 @@ exports.get_set_card = async (req, res) => {
     const page = req.params.page;
     const offset = page * 50 - 50;
     const sqlc = ` SELECT  COUNT(*) as recNum
-                  FROM    ${type}_cards 
+                  FROM    ${type}_cards_dev 
                   WHERE   LOWER(category) LIKE '%${keyword}%'`;
     const sql = ` SELECT  *, CONVERT (text USING utf8) as text2
-                  FROM    ${type}_cards 
+                  FROM    ${type}_cards_dev 
                   WHERE   LOWER(category) LIKE '%${keyword}%'
                   ORDER BY id
                   LIMIT 50 OFFSET ${offset}`;
@@ -324,10 +324,10 @@ exports.find_card_with_filter = async (req, res) => {
     const offset = page * 50 - 50;
 
     let sqlCount = `  SELECT  COUNT(*) as recNum
-                      FROM    ${type}_cards 
+                      FROM    ${type}_cards_dev 
                       WHERE   TRUE `;
     let sqlFind = `  SELECT  *, CONVERT (text USING utf8) as text2
-                      FROM    ${type}_cards 
+                      FROM    ${type}_cards_dev 
                       WHERE   TRUE `;
 
     if (nation) {
