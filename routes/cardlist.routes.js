@@ -4,18 +4,19 @@ import {
   categoryId,
   category,
   add_category,
-  card_list,
   card_detail,
   add_card,
   delete_card,
   edit_card,
   find_card,
   find_card2,
+  card_category,
   card_list_pagination,
   card_list_total_pages,
   get_random_card,
   get_set_card,
-  find_card_with_filter
+  find_card_with_filter,
+  card_list_home
 } from "../controllers/cardlist.controller";
 import { json, urlencoded } from "body-parser";
 
@@ -26,12 +27,12 @@ router.get("/categoryId", categoryId);
 router.get("/category", category);
 router.post("/addCategory", add_category);
 router.get(
-  "/:type",
+  "/:type/home",
   (req, res, next) => {
     req.type = req.params.type;
     next();
   },
-  card_list
+  card_list_home
 );
 router.get(
   "/:type/total_pages",
@@ -49,6 +50,14 @@ router.get(
   },
   card_detail
 );
+router.get(
+  "/:type/category",
+  (req, res, next) => {
+    req.type = req.params.type;
+    next();
+  },
+  card_category
+)
 router.post(
   "/:type/addCard",
   (req, res, next) => {
