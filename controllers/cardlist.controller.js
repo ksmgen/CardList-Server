@@ -321,6 +321,8 @@ exports.find_card_with_filter = async (req, res) => {
     const orderBy = req.query.orderBy;
     const set = req.query.set;
     const grade = req.query.givenGradeList;
+    const givenFinishing = req.query.givenFinishingList;
+    const givenFinishingArr = givenFinishing.split(",");
     const card_type = req.query.type;
     const page = req.params.page;
     const offset = page * 50 - 50;
@@ -350,6 +352,18 @@ exports.find_card_with_filter = async (req, res) => {
     if (grade) {
       sqlCount += `AND grade in (${grade})`;
       sqlFind +=`AND grade in (${grade})`;
+    }
+
+    if (givenFinishing) {
+      // Loop through the givenFinishingArr and add the sql
+      sqlCount += `AND ( FALSE `;
+      sqlFind += `AND ( FALSE `;
+      for (let i = 0; i < givenFinishingArr.length; i++) {
+        sqlCount += `OR finishing LIKE '%${givenFinishingArr[i]}%' `;
+        sqlFind += `OR finishing LIKE '%${givenFinishingArr[i]}%' `;
+      }
+      sqlCount += `) `;
+      sqlFind += `) `;
     }
 
     sqlCount += `AND ( FALSE `;
