@@ -313,12 +313,14 @@ exports.get_set_card = async (req, res) => {
 
 exports.find_card_with_filter = async (req, res) => {
   try {
+    console.log(req.query)
     const type = req.type;
     const keyword = req.query.keyword;
     const paramChecked = req.params.paramChecked;
     const nation = req.query.nation;
     const orderBy = req.query.orderBy;
     const set = req.query.set;
+    const grade = req.query.givenGradeList;
     const card_type = req.query.type;
     const page = req.params.page;
     const offset = page * 50 - 50;
@@ -343,6 +345,11 @@ exports.find_card_with_filter = async (req, res) => {
     if (card_type) {
       sqlCount += `AND type = '${card_type}' `;
       sqlFind += `AND type = '${card_type}' `;
+    }
+
+    if (grade) {
+      sqlCount += `AND grade in (${grade})`;
+      sqlFind +=`AND grade in (${grade})`;
     }
 
     sqlCount += `AND ( FALSE `;
