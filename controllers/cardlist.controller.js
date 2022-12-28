@@ -76,7 +76,7 @@ exports.add_card = async (req, res) => {
   try {
     const type = req.type;
     const card = req.body;
-    const sql = `INSERT INTO ${type}_cards_dev (SKU, name, text, flavor, category, image, grade, nation, rarity, race, critical, illustrator, power, regulation, shield, skill, trigger_text, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    const sql = `INSERT INTO ${type}_cards_dev (SKU, name, text, flavor, category, image, image2, grade, nation, rarity, race, critical, illustrator, power, regulation, shield, skill, trigger_text, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
     const results = await db
       .promise()
       .query(sql, [
@@ -86,6 +86,7 @@ exports.add_card = async (req, res) => {
         card.flavor,
         card.category,
         card.image,
+        card.image2,
         parseInt(card.grade),
         card.nation,
         card.rarity,
@@ -313,7 +314,7 @@ exports.get_set_card = async (req, res) => {
 
 exports.find_card_with_filter = async (req, res) => {
   try {
-    console.log(req.query)
+    console.log(req.query);
     const type = req.type;
     const keyword = req.query.keyword;
     const paramChecked = req.params.paramChecked;
@@ -351,7 +352,7 @@ exports.find_card_with_filter = async (req, res) => {
 
     if (grade) {
       sqlCount += `AND grade in (${grade})`;
-      sqlFind +=`AND grade in (${grade})`;
+      sqlFind += `AND grade in (${grade})`;
     }
 
     if (givenFinishing) {
