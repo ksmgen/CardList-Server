@@ -53,7 +53,7 @@ exports.card_detail = async (req, res) => {
   try {
     const type = req.type;
     const card_id = req.params.id;
-    const sql = `SELECT id, SKU, name, CONVERT (text USING utf8) AS text, flavor, category, image, grade, nation, rarity, race, critical, illustrator, power, regulation, shield, skill, trigger_text, type FROM ${type}_cards_dev WHERE id = ?`;
+    const sql = `SELECT id, SKU, name, CONVERT (text USING utf8) AS text, flavor, category, image, image2, grade, nation, rarity, race, critical, illustrator, power, regulation, shield, skill, trigger_text, type FROM ${type}_cards_dev WHERE id = ?`;
     const results = await db.promise().query(sql, card_id);
     res.json(results[0]);
   } catch (error) {
@@ -126,7 +126,7 @@ exports.edit_card = async (req, res) => {
     const card = req.body;
     const card_id = req.params.id;
     console.log(card_id);
-    const sql = `UPDATE ${type}_cards_dev SET SKU = ?, name = ?, text = ?, flavor = ?, category = ?, image = ?, grade = ?, nation = ?, rarity = ?, race = ?, critical = ?, illustrator = ?, power = ?, regulation = ?, shield = ?, skill = ?, trigger_text = ?, type = ? WHERE id = ?`;
+    const sql = `UPDATE ${type}_cards_dev SET SKU = ?, name = ?, text = ?, flavor = ?, category = ?, image = ?, image2 = ?, grade = ?, nation = ?, rarity = ?, race = ?, critical = ?, illustrator = ?, power = ?, regulation = ?, shield = ?, skill = ?, trigger_text = ?, type = ? WHERE id = ?`;
     const results = await db
       .promise()
       .query(sql, [
@@ -136,6 +136,7 @@ exports.edit_card = async (req, res) => {
         card.flavor,
         card.category,
         card.image,
+        card.image2,
         parseInt(card.grade),
         card.nation,
         card.rarity,
