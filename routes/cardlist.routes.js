@@ -5,6 +5,7 @@ import {
   category,
   add_category,
   card_detail,
+  card_detail2,
   add_card,
   delete_card,
   edit_card,
@@ -16,7 +17,7 @@ import {
   get_random_card,
   get_set_card,
   find_card_with_filter,
-  card_list_home
+  card_list_home,
 } from "../controllers/cardlist.controller";
 import { json, urlencoded } from "body-parser";
 
@@ -51,13 +52,21 @@ router.get(
   card_detail
 );
 router.get(
+  "/:type/detail/sku/:sku",
+  (req, res, next) => {
+    req.type = req.params.type;
+    next();
+  },
+  card_detail2
+);
+router.get(
   "/:type/category",
   (req, res, next) => {
     req.type = req.params.type;
     next();
   },
   card_category
-)
+);
 router.post(
   "/:type/addCard",
   (req, res, next) => {
