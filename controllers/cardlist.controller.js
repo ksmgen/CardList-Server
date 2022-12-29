@@ -361,9 +361,18 @@ exports.find_card_with_filter = async (req, res) => {
       sqlCount += `AND ( FALSE `;
       sqlFind += `AND ( FALSE `;
       for (let i = 0; i < givenFinishingArr.length; i++) {
-        sqlCount += `OR finishing LIKE '%${givenFinishingArr[i]}%' `;
-        sqlFind += `OR finishing LIKE '%${givenFinishingArr[i]}%' `;
+        currentFinishing = givenFinishingArr[i];
+        if (currentFinishing == "Stamped") {
+            // based on current database, cards with "Stamped" finishing do not have "Foil + Stamped" finishing
+            // but cards with "Foil" finishing do have "Foil + Stamped" finishing too
+            sqlCount += `OR finishing LIKE '%${currentFinishing}%' AND finishing NOT LIKE '%Foil + Stamped%' `;
+            sqlFind += `OR finishing LIKE '%${currentFinishing}%' AND finishing NOT LIKE '%Foil + Stamped%' `;
+        } else {
+          sqlCount += `OR finishing LIKE '%${currentFinishing}%' `;
+          sqlFind += `OR finishing LIKE '%${currentFinishing}%' `;
+        }
       }
+      
       sqlCount += `) `;
       sqlFind += `) `;
     }
