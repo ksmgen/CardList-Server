@@ -8,7 +8,7 @@
   "license": "Unlicensed",
   "private": true,
   "scripts": {
-    "start": "node start.js",
+    "start": "env-cmd -f ./live.env node start.js",
     "start:dev": "env-cmd -f ./dev.env node start.js"
   },
   "dependencies": {
