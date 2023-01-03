@@ -327,6 +327,7 @@ exports.get_random_card = async (req, res) => {
       : process.env.PRINTEDCARDTABLE;
     const sql = ` SELECT  *, CONVERT (text USING utf8) as text2
                   FROM    ${table}
+                  WHERE (published = 1)
                   ORDER BY RAND ( )  
                   LIMIT 1`;
 
@@ -386,7 +387,7 @@ exports.find_card_with_filter = async (req, res) => {
 
     let sqlCount = `  SELECT  COUNT(*) as recNum
                       FROM    ${table} 
-                      WHERE   TRUE `;
+                      WHERE   TRUE AND (published = 1) `;
     let sqlFind = `  SELECT  *, CONVERT (text USING utf8) as text2
                       FROM    ${table}
                       WHERE   TRUE AND (published = 1) `;

@@ -9,15 +9,17 @@ import {
   add_card,
   delete_card,
   edit_card,
-  find_card,
+  // find_card,
   find_card2,
   card_category,
   card_list_pagination,
   card_list_total_pages,
   get_random_card,
   get_set_card,
-  find_card_with_filter,
   card_list_home,
+} from "../controllers/cardlist.controller";
+import {
+  find_card_with_filter,
 } from "../controllers/cardlist.controller";
 import { json, urlencoded } from "body-parser";
 
