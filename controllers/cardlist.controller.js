@@ -389,7 +389,7 @@ exports.find_card_with_filter = async (req, res) => {
                       WHERE   TRUE `;
     let sqlFind = `  SELECT  *, CONVERT (text USING utf8) as text2
                       FROM    ${table}
-                      WHERE   TRUE `;
+                      WHERE   TRUE AND (published = 1) `;
 
     if (nation) {
       sqlCount += `AND nation = '${nation}' `;
