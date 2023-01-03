@@ -412,3 +412,192 @@ exports.find_card_with_filter = async (req, res) => {
     console.log(error);
   }
 };
+
+
+exports.find_advance = async (req, res) => {
+  // http://localhost:3001/cardlist/oracle/find_advance/1/?name=&text=&power=&shield=&race=&flavor=&illustrator=&set=&grade=&rarity=&unitType=&trigger=&finishing=&orderBy=
+  try {
+    console.log(req.query)
+    const type = req.type;
+    const name = req.query.name;
+    const nameArr = name.split(",");
+    const text = req.query.text;
+    const textArr = text.split(",");
+    const power = req.query.power;
+    const shield = req.query.shield;
+    const race = req.query.race;
+    const raceArr = race.split(",");
+    const flavor = req.query.flavor;
+    const flavorArr = flavor.split(",");
+    const illustrator = req.query.illustrator;
+    const illustratorArr = illustrator.split(",");
+    const set = req.query.set;
+    const setArr = set.split(",");
+    const grade = req.query.grade;
+    const rarity = req.query.rarity;
+    const rarityArr = rarity.split(",").map((e) => `'${e}'`);
+    const unitType = req.query.unitType;
+    const unitTypeArr = unitType.split(",").map((e) => `'${e}'`);
+    const trigger = req.query.trigger;
+    const triggerArr = trigger.split(",");
+    const finishing = req.query.finishing;
+    const finishingArr = finishing.split(",");
+    const orderBy = req.query.orderBy;
+
+    const page = req.params.page;
+    const offset = page * 50 - 50;
+
+    let sqlCount = `  SELECT  COUNT(*) as recNum
+                      FROM    ${type}_cards_dev 
+                      WHERE   TRUE `;
+    let sqlFind = `  SELECT  *, CONVERT (text USING utf8) as text2
+                      FROM    ${type}_cards_dev 
+                      WHERE   TRUE `;
+    
+    if (name) {
+      sqlCount += `AND ( FALSE `;
+      sqlFind += `AND ( FALSE `;
+      nameArr.forEach(val => {
+        sqlCount += `OR LOWER(name) LIKE '%${val}%' `;
+        sqlFind += `OR LOWER(name) LIKE '%${val}%' `;
+      });
+      sqlCount += `) `;
+      sqlFind += `) `;
+    }
+
+    if (text) {
+      sqlCount += `AND ( FALSE `;
+      sqlFind += `AND ( FALSE `;
+      textArr.forEach(val => {
+        sqlCount += `OR LOWER(CONVERT (text USING utf8)) LIKE '%${val}%' `;
+        sqlFind += `OR LOWER(CONVERT (text USING utf8)) LIKE '%${val}%' `;
+      });
+      sqlCount += `) `;
+      sqlFind += `) `;
+    }
+
+    if (power) {
+      sqlCount += `AND (power in (${power}))`
+      sqlFind += `AND (power in (${power}))`
+    }
+
+    if (shield) {
+      sqlCount += `AND (shield in (${shield}))`
+      sqlFind += `AND (shield in (${shield}))`
+    }
+
+    if (race) {
+      sqlCount += `AND ( FALSE `;
+      sqlFind += `AND ( FALSE `;
+      raceArr.forEach(val => {
+        sqlCount += `OR LOWER(race) LIKE '%${val}%' `;
+        sqlFind += `OR LOWER(race) LIKE '%${val}%' `;
+      });
+      sqlCount += `) `;
+      sqlFind += `) `;
+    }
+
+    if (flavor) {
+      sqlCount += `AND ( FALSE `;
+      sqlFind += `AND ( FALSE `;
+      flavorArr.forEach(val => {
+        sqlCount += `OR LOWER(flavor) LIKE '%${val}%' `;
+        sqlFind += `OR LOWER(flavor) LIKE '%${val}%' `;
+      });
+      sqlCount += `) `;
+      sqlFind += `) `;
+    }
+
+    if (illustrator) {
+      sqlCount += `AND ( FALSE `;
+      sqlFind += `AND ( FALSE `;
+      illustratorArr.forEach(val => {
+        sqlCount += `OR illustrator LIKE '%${val}%' `;
+        sqlFind += `OR illustrator LIKE '%${val}%' `;
+      });
+      sqlCount += `) `;
+      sqlFind += `) `;
+    }
+
+    if (set) {
+      sqlCount += `AND ( FALSE `;
+      sqlFind += `AND ( FALSE `;
+      setArr.forEach(val => {
+        sqlCount += `OR category LIKE '%${val}%' `;
+        sqlFind += `OR category LIKE '%${val}%' `;
+        });
+      sqlCount += `) `;
+      sqlFind += `) `;
+    }
+
+    if (grade) {
+      sqlCount += `AND (grade in (${grade}))`;
+      sqlFind +=`AND (grade in (${grade}))`;
+    }
+
+    if (rarity) {
+      sqlCount += `AND (rarity in (${rarityArr}))`
+      sqlFind += `AND (rarity in (${rarityArr}))`
+    }
+
+    if (unitType) {
+      sqlCount += `AND (type in (${unitTypeArr}))`
+      sqlFind += `AND (type in (${unitTypeArr}))`
+
+    }
+
+    if (trigger) {
+      sqlCount += `AND ( FALSE `;
+      sqlFind += `AND ( FALSE `;
+      triggerArr.forEach(val => {
+        sqlCount += `OR trigger_text LIKE '%${val}%' `;
+        sqlFind += `OR trigger_text LIKE '%${val}%' `;
+        });
+      sqlCount += `) `;
+      sqlFind += `) `;
+    }
+
+    if (finishing) {
+      // Loop through the finishingArr and add the sql
+      sqlCount += `AND ( FALSE `;
+      sqlFind += `AND ( FALSE `;
+      for (let i = 0; i < finishingArr.length; i++) {
+        currentFinishing = finishingArr[i];
+        if (currentFinishing == "Stamped") {
+            // based on current database, cards with "Stamped" finishing do not have "Foil + Stamped" finishing
+            // but cards with "Foil" finishing do have "Foil + Stamped" finishing too
+            sqlCount += `OR finishing LIKE '%${currentFinishing}%' AND finishing NOT LIKE '%Foil + Stamped%' `;
+            sqlFind += `OR finishing LIKE '%${currentFinishing}%' AND finishing NOT LIKE '%Foil + Stamped%' `;
+        } else {
+          sqlCount += `OR finishing LIKE '%${currentFinishing}%' `;
+          sqlFind += `OR finishing LIKE '%${currentFinishing}%' `;
+        }
+      }
+      sqlCount += `) `;
+      sqlFind += `) `;
+    }
+
+
+    if (orderBy) {
+      sqlFind += `ORDER BY ${orderBy.toLowerCase()} LIMIT 50 OFFSET ${offset}`;
+    } else {
+      sqlFind += `ORDER BY id LIMIT 50 OFFSET ${offset}`;
+    }
+
+    const resultCount = await db.promise().query(sqlCount);
+    const results = await db.promise().query(sqlFind);
+
+    console.log(sqlFind);
+
+    res.json({ count: resultCount[0][0]["recNum"], cards: results[0] });
+  } catch (error) {
+    console.log(error);
+  }
+
+};
+
+
+
+
+
+
