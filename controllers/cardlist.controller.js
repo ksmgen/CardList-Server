@@ -3,6 +3,8 @@ const db = require("../database");
 exports.card_list_home = async (req, res) => {
   try {
     const type = req.type;
+    // example for @claudia
+    const table = type.includes("oracle") ? process.env.ORACLECARDTABLE : process.env.PRINTEDCARDTABLE
     const results = await db
       .promise()
       .query(
