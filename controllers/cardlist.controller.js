@@ -476,7 +476,7 @@ exports.find_advance = async (req, res) => {
   // http://localhost:3001/cardlist/oracle/find_advance/1/?name=&text=&power=&shield=&race=&flavor=&illustrator=&set=&grade=&rarity=&unitType=&trigger=&finishing=&orderBy=
   try {
     console.log(req.query)
-    const table = type.includes("oracle")
+    const table = req.type.includes("oracle")
       ? process.env.ORACLECARDTABLE
       : process.env.PRINTEDCARDTABLE;
     const name = req.query.name;
@@ -603,7 +603,6 @@ exports.find_advance = async (req, res) => {
     if (unitType) {
       sqlCount += `AND (type in (${unitTypeArr}))`
       sqlFind += `AND (type in (${unitTypeArr}))`
-
     }
 
     if (trigger) {

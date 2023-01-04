@@ -17,12 +17,10 @@ import {
   get_random_card,
   get_set_card,
   card_list_home,
-} from "../controllers/cardlist.controller";
-import {
   find_card_with_filter,
   find_advance,
-  card_list_home
 } from "../controllers/cardlist.controller";
+
 import { json, urlencoded } from "body-parser";
 
 router.use(json());
