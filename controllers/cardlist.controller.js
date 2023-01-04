@@ -3,10 +3,14 @@ const db = require("../database");
 exports.card_list_home = async (req, res) => {
   try {
     const type = req.type;
+    // example for @claudia
+    const table = type.includes("oracle")
+      ? process.env.ORACLECARDTABLE
+      : process.env.PRINTEDCARDTABLE;
     const results = await db
       .promise()
       .query(
-        `SELECT id, SKU, name, CONVERT (text USING utf8) AS text, flavor, category, image, grade, nation, rarity, race, critical, illustrator, power, regulation, shield, skill, trigger_text, type FROM ${type}_cards_dev ORDER BY last_update LIMIT 9`
+        `SELECT id, SKU, name, CONVERT (text USING utf8) AS text, flavor, category, image, grade, nation, rarity, race, critical, illustrator, power, regulation, shield, skill, trigger_text, type FROM ${table} ORDER BY last_update LIMIT 9`
       );
     res.json(results[0]);
   } catch (error) {
@@ -17,12 +21,15 @@ exports.card_list_home = async (req, res) => {
 exports.card_list_pagination = async (req, res) => {
   try {
     const type = req.type;
+    const table = type.includes("oracle")
+      ? process.env.ORACLECARDTABLE
+      : process.env.PRINTEDCARDTABLE;
     const page = req.params.page;
     const offset = 50 * page - 50;
     const sqlCount = `  SELECT  COUNT(*) as recNum
-                        FROM    ${type}_cards_dev`;
+                        FROM    ${table}`;
     const sql = ` SELECT  *, CONVERT (text USING utf8) as text2
-                  FROM    ${type}_cards_dev 
+                  FROM    ${table} 
                   ORDER BY id
                   LIMIT 50 OFFSET ${offset}`;
 
@@ -39,9 +46,12 @@ exports.card_list_pagination = async (req, res) => {
 exports.card_list_total_pages = async (req, res) => {
   try {
     const type = req.type;
+    const table = type.includes("oracle")
+      ? process.env.ORACLECARDTABLE
+      : process.env.PRINTEDCARDTABLE;
     const results = await db.promise().query(
       ` SELECT  COUNT(*) as recNum
-          FROM    ${type}_cards_dev`
+          FROM    ${table}`
     );
     res.json(Math.ceil(results[0][0]["recNum"] / 50));
   } catch (error) {
@@ -52,9 +62,27 @@ exports.card_list_total_pages = async (req, res) => {
 exports.card_detail = async (req, res) => {
   try {
     const type = req.type;
+    const table = type.includes("oracle")
+      ? process.env.ORACLECARDTABLE
+      : process.env.PRINTEDCARDTABLE;
     const card_id = req.params.id;
-    const sql = `SELECT id, SKU, name, CONVERT (text USING utf8) AS text, flavor, category, image, grade, nation, rarity, race, critical, illustrator, power, regulation, shield, skill, trigger_text, type FROM ${type}_cards_dev WHERE id = ?`;
+    const sql = `SELECT id, SKU, name, CONVERT (text USING utf8) AS text, flavor, category, image, image2, grade, nation, rarity, race, critical, illustrator, power, regulation, shield, skill, trigger_text, type, finishing FROM ${table} WHERE id = ?`;
     const results = await db.promise().query(sql, card_id);
+    res.json(results[0]);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+exports.card_detail2 = async (req, res) => {
+  try {
+    const type = req.type;
+    const table = type.includes("oracle")
+      ? process.env.ORACLECARDTABLE
+      : process.env.PRINTEDCARDTABLE;
+    const card_sku = req.params.sku;
+    const sql = `SELECT id, SKU, name, CONVERT (text USING utf8) AS text, flavor, category, image, image2, grade, nation, rarity, race, critical, illustrator, power, regulation, shield, skill, trigger_text, type, finishing FROM ${table} WHERE REPLACE(SKU,'/','-') LIKE '%${card_sku}%'`;
+    const results = await db.promise().query(sql);
     res.json(results[0]);
   } catch (error) {
     console.log(error);
@@ -64,7 +92,10 @@ exports.card_detail = async (req, res) => {
 exports.card_category = async (req, res) => {
   try {
     const type = req.type;
-    const sql = `SELECT DISTINCT category FROM ${type}_cards_dev`;
+    const table = type.includes("oracle")
+      ? process.env.ORACLECARDTABLE
+      : process.env.PRINTEDCARDTABLE;
+    const sql = `SELECT DISTINCT category FROM ${table}`;
     const results = await db.promise().query(sql);
     res.json(results[0]);
   } catch (error) {
@@ -75,8 +106,11 @@ exports.card_category = async (req, res) => {
 exports.add_card = async (req, res) => {
   try {
     const type = req.type;
+    const table = type.includes("oracle")
+      ? process.env.ORACLECARDTABLE
+      : process.env.PRINTEDCARDTABLE;
     const card = req.body;
-    const sql = `INSERT INTO ${type}_cards_dev (SKU, name, text, flavor, category, image, grade, nation, rarity, race, critical, illustrator, power, regulation, shield, skill, trigger_text, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    const sql = `INSERT INTO ${table} (SKU, name, text, flavor, category, image, image2, grade, nation, rarity, race, critical, illustrator, power, regulation, shield, skill, trigger_text, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
     const results = await db
       .promise()
       .query(sql, [
@@ -86,6 +120,7 @@ exports.add_card = async (req, res) => {
         card.flavor,
         card.category,
         card.image,
+        card.image2,
         parseInt(card.grade),
         card.nation,
         card.rarity,
@@ -110,8 +145,11 @@ exports.add_card = async (req, res) => {
 exports.delete_card = async (req, res) => {
   try {
     const type = req.type;
+    const table = type.includes("oracle")
+      ? process.env.ORACLECARDTABLE
+      : process.env.PRINTEDCARDTABLE;
     const card_id = req.params.id;
-    const sql = `DELETE FROM ${type}_cards_dev WHERE id = ?`;
+    const sql = `DELETE FROM ${table} WHERE id = ?`;
     const results = await db.promise().query(sql, card_id);
     res.json(results[0]);
   } catch (error) {
@@ -122,10 +160,13 @@ exports.delete_card = async (req, res) => {
 exports.edit_card = async (req, res) => {
   try {
     const type = req.type;
+    const table = type.includes("oracle")
+      ? process.env.ORACLECARDTABLE
+      : process.env.PRINTEDCARDTABLE;
     const card = req.body;
     const card_id = req.params.id;
     console.log(card_id);
-    const sql = `UPDATE ${type}_cards_dev SET SKU = ?, name = ?, text = ?, flavor = ?, category = ?, image = ?, grade = ?, nation = ?, rarity = ?, race = ?, critical = ?, illustrator = ?, power = ?, regulation = ?, shield = ?, skill = ?, trigger_text = ?, type = ? WHERE id = ?`;
+    const sql = `UPDATE ${table} SET SKU = ?, name = ?, text = ?, flavor = ?, category = ?, image = ?, image2 = ?, grade = ?, nation = ?, rarity = ?, race = ?, critical = ?, illustrator = ?, power = ?, regulation = ?, shield = ?, skill = ?, trigger_text = ?, type = ? WHERE id = ?`;
     const results = await db
       .promise()
       .query(sql, [
@@ -135,6 +176,7 @@ exports.edit_card = async (req, res) => {
         card.flavor,
         card.category,
         card.image,
+        card.image2,
         parseInt(card.grade),
         card.nation,
         card.rarity,
@@ -196,12 +238,15 @@ exports.add_category = async (req, res) => {
 exports.find_card = async (req, res) => {
   try {
     const type = req.type;
+    const table = type.includes("oracle")
+      ? process.env.ORACLECARDTABLE
+      : process.env.PRINTEDCARDTABLE;
     const keyword = decodeURI(req.params.keyword).toLowerCase();
     const page = req.params.page;
     const offset = page * 50 - 50;
 
     const sqlCount = `  SELECT  COUNT(*) as recNum
-                        FROM    ${type}_cards_dev 
+                        FROM    ${table}
                         WHERE   LOWER(SKU) LIKE '%${keyword}%' 
                                   OR LOWER(name) LIKE '%${keyword}%' 
                                   OR LOWER(CONVERT (text USING utf8)) LIKE '%${keyword}%' 
@@ -210,7 +255,7 @@ exports.find_card = async (req, res) => {
                                   OR LOWER(race) LIKE '%${keyword}%' 
                                   OR LOWER(illustrator) LIKE '%${keyword}%'`;
     const sql = ` SELECT  *, CONVERT (text USING utf8) as text2
-                  FROM    ${type}_cards_dev 
+                  FROM    ${table}
                   WHERE   LOWER(SKU) LIKE '%${keyword}%' 
                             OR LOWER(name) LIKE '%${keyword}%' 
                             OR LOWER(CONVERT (text USING utf8)) LIKE '%${keyword}%' 
@@ -233,16 +278,19 @@ exports.find_card = async (req, res) => {
 exports.find_card2 = async (req, res) => {
   try {
     const type = req.type;
+    const table = type.includes("oracle")
+      ? process.env.ORACLECARDTABLE
+      : process.env.PRINTEDCARDTABLE;
     const keyword = decodeURI(req.params.keyword).toLowerCase();
     const param = req.params.param;
     const page = req.params.page;
     const offset = page * 50 - 50;
 
     let sqlCount = `  SELECT  COUNT(*) as recNum
-                      FROM    ${type}_cards_dev 
+                      FROM    ${table}
                       WHERE   FALSE `;
     let sqlFind = `  SELECT  *, CONVERT (text USING utf8) as text2
-                      FROM    ${type}_cards_dev 
+                      FROM    ${table}
                       WHERE   FALSE `;
 
     if (param.includes("name")) {
@@ -274,8 +322,12 @@ exports.find_card2 = async (req, res) => {
 exports.get_random_card = async (req, res) => {
   try {
     const type = req.type;
+    const table = type.includes("oracle")
+      ? process.env.ORACLECARDTABLE
+      : process.env.PRINTEDCARDTABLE;
     const sql = ` SELECT  *, CONVERT (text USING utf8) as text2
-                  FROM    ${type}_cards_dev 
+                  FROM    ${table}
+                  WHERE (published = 1)
                   ORDER BY RAND ( )  
                   LIMIT 1`;
 
@@ -290,14 +342,17 @@ exports.get_random_card = async (req, res) => {
 exports.get_set_card = async (req, res) => {
   try {
     const type = req.type;
+    const table = type.includes("oracle")
+      ? process.env.ORACLECARDTABLE
+      : process.env.PRINTEDCARDTABLE;
     const keyword = decodeURI(req.params.keyword).toLowerCase();
     const page = req.params.page;
     const offset = page * 50 - 50;
     const sqlc = ` SELECT  COUNT(*) as recNum
-                  FROM    ${type}_cards_dev 
+                  FROM    ${table} 
                   WHERE   LOWER(category) LIKE '%${keyword}%'`;
     const sql = ` SELECT  *, CONVERT (text USING utf8) as text2
-                  FROM    ${type}_cards_dev 
+                  FROM    ${table}
                   WHERE   LOWER(category) LIKE '%${keyword}%'
                   ORDER BY id
                   LIMIT 50 OFFSET ${offset}`;
@@ -313,8 +368,11 @@ exports.get_set_card = async (req, res) => {
 
 exports.find_card_with_filter = async (req, res) => {
   try {
-    console.log(req.query)
+    console.log(req.query);
     const type = req.type;
+    const table = type.includes("oracle")
+      ? process.env.ORACLECARDTABLE
+      : process.env.PRINTEDCARDTABLE;
     const keyword = req.query.keyword;
     const paramChecked = req.params.paramChecked;
     const nation = req.query.nation;
@@ -328,11 +386,11 @@ exports.find_card_with_filter = async (req, res) => {
     const offset = page * 50 - 50;
 
     let sqlCount = `  SELECT  COUNT(*) as recNum
-                      FROM    ${type}_cards_dev 
-                      WHERE   TRUE `;
+                      FROM    ${table} 
+                      WHERE   (published = 1) `;
     let sqlFind = `  SELECT  *, CONVERT (text USING utf8) as text2
-                      FROM    ${type}_cards_dev 
-                      WHERE   TRUE `;
+                      FROM    ${table}
+                      WHERE   (published = 1) `;
 
     if (nation) {
       sqlCount += `AND nation = '${nation}' `;
@@ -351,7 +409,7 @@ exports.find_card_with_filter = async (req, res) => {
 
     if (grade) {
       sqlCount += `AND grade in (${grade})`;
-      sqlFind +=`AND grade in (${grade})`;
+      sqlFind += `AND grade in (${grade})`;
     }
 
     if (givenFinishing) {
@@ -361,16 +419,16 @@ exports.find_card_with_filter = async (req, res) => {
       for (let i = 0; i < givenFinishingArr.length; i++) {
         currentFinishing = givenFinishingArr[i];
         if (currentFinishing == "Stamped") {
-            // based on current database, cards with "Stamped" finishing do not have "Foil + Stamped" finishing
-            // but cards with "Foil" finishing do have "Foil + Stamped" finishing too
-            sqlCount += `OR finishing LIKE '%${currentFinishing}%' AND finishing NOT LIKE '%Foil + Stamped%' `;
-            sqlFind += `OR finishing LIKE '%${currentFinishing}%' AND finishing NOT LIKE '%Foil + Stamped%' `;
+          // based on current database, cards with "Stamped" finishing do not have "Foil + Stamped" finishing
+          // but cards with "Foil" finishing do have "Foil + Stamped" finishing too
+          sqlCount += `OR finishing LIKE '%${currentFinishing}%' AND finishing NOT LIKE '%Foil + Stamped%' `;
+          sqlFind += `OR finishing LIKE '%${currentFinishing}%' AND finishing NOT LIKE '%Foil + Stamped%' `;
         } else {
           sqlCount += `OR finishing LIKE '%${currentFinishing}%' `;
           sqlFind += `OR finishing LIKE '%${currentFinishing}%' `;
         }
       }
-      
+
       sqlCount += `) `;
       sqlFind += `) `;
     }
@@ -418,7 +476,9 @@ exports.find_advance = async (req, res) => {
   // http://localhost:3001/cardlist/oracle/find_advance/1/?name=&text=&power=&shield=&race=&flavor=&illustrator=&set=&grade=&rarity=&unitType=&trigger=&finishing=&orderBy=
   try {
     console.log(req.query)
-    const type = req.type;
+    const table = type.includes("oracle")
+      ? process.env.ORACLECARDTABLE
+      : process.env.PRINTEDCARDTABLE;
     const name = req.query.name;
     const nameArr = name.split(",");
     const text = req.query.text;
@@ -448,11 +508,11 @@ exports.find_advance = async (req, res) => {
     const offset = page * 50 - 50;
 
     let sqlCount = `  SELECT  COUNT(*) as recNum
-                      FROM    ${type}_cards_dev 
-                      WHERE   TRUE `;
+                      FROM    ${table} 
+                      WHERE   (published = 1) `;
     let sqlFind = `  SELECT  *, CONVERT (text USING utf8) as text2
-                      FROM    ${type}_cards_dev 
-                      WHERE   TRUE `;
+                      FROM    ${table}
+                      WHERE   (published = 1) `;
     
     if (name) {
       sqlCount += `AND ( FALSE `;
