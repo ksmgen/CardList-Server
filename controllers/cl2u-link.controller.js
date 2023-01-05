@@ -4,15 +4,19 @@ exports.getOracle = async (req, res) => {
   try {
     const sku = decodeURIComponent(req.sku);
 
-    const sqlFind = `  SELECT  *, CONVERT (text USING utf8) as text2
+    const sqlFind = ` SELECT  *, CONVERT (text USING utf8) as text2
                       FROM    ${process.env.ORACLECARDTABLE}
                       WHERE   SKU = "${sku}" AND published = 1`;
+
+    console.log(sqlFind);
 
     const results = await db.promise().query(sqlFind);
 
     const card = results[0][0];
     card.text = card.text2;
     delete card.text2;
+
+    console.log(card)
 
     res.json({ result: "ok", card: card });
   } catch (error) {
