@@ -162,9 +162,10 @@ router.get(
 
 // CL2U-getOracle
 router.get(
-  "/api/card/:sku",
+  "/api/card/:d/:no",
   (req, res, next) => {
-    req.sku = req.params.sku;
+    req.d = req.params.d;
+    req.no = req.params.no;
     next();
   },
   getOracle
