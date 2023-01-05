@@ -21,6 +21,8 @@ import {
   find_advance,
 } from "../controllers/cardlist.controller";
 
+import { getOracle } from "../controllers/cl2u-link.controller";
+
 import { json, urlencoded } from "body-parser";
 
 router.use(json());
@@ -156,6 +158,16 @@ router.get(
     next();
   },
   find_advance
+);
+
+// CL2U-getOracle
+router.get(
+  "/api/card/:sku",
+  (req, res, next) => {
+    req.sku = req.params.sku;
+    next();
+  },
+  getOracle
 );
 
 export default router;
