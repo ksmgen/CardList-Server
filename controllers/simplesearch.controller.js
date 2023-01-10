@@ -12,8 +12,8 @@ exports.find_card_with_filter = async (req, res) => {
     const nation = req.query.nation;
     const orderBy = req.query.orderBy;
     const set = req.query.set;
-    const grade = req.query.givenGradeList;
-    const givenFinishing = req.query.givenFinishingList;
+    const grade = req.query.grade;
+    const givenFinishing = req.query.finishing;
     const givenFinishingArr = givenFinishing.split(",");
     const card_type = req.query.type;
     const page = req.params.page;
