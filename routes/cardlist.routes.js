@@ -19,6 +19,7 @@ import {
   card_list_home,
   find_card_with_filter,
   find_advance,
+  find_quick,
 } from "../controllers/cardlist.controller";
 
 import { getOracle } from "../controllers/cl2u-link.controller";
@@ -158,6 +159,16 @@ router.get(
     next();
   },
   find_advance
+);
+
+// QUICK SEARCH FROM NAVBAR
+router.get(
+  "/:type/find_quick/:page",
+  (req, res, next) => {
+    req.type = req.params.type;
+    next();
+  },
+  find_quick
 );
 
 // CL2U-getOracle

@@ -655,6 +655,44 @@ exports.find_advance = async (req, res) => {
 
 };
 
+exports.find_quick = async (req, res) => {
+  // search from navbar
+  try {
+    console.log(req.query)
+    const table =
+      req.type.includes("oracle")
+        ? process.env.ORACLECARDTABLE
+        : process.env.PRINTEDCARDTABLE;
+    const keyword = req.query.keyword;
+    const page = req.params.page;
+    const offset = page * 50 - 50;
+
+    let sqlCount = `  SELECT  COUNT(*) as recNum
+                      FROM    ${table} 
+                      WHERE   (published = 1) `;
+    let sqlFind = `  SELECT  *, CONVERT (text USING utf8) as text2
+                      FROM    ${table}
+                      WHERE   (published = 1) `;
+
+    if (keyword) {
+      sqlCount += `AND ( name LIKE '%${keyword}%')`;
+      sqlFind += `AND ( name LIKE '%${keyword}%')`;
+    }
+
+    sqlFind += `ORDER BY id LIMIT 50 OFFSET ${offset}`;
+
+    const resultCount = await db.promise().query(sqlCount);
+    const results = await db.promise().
+    query(sqlFind);
+
+    console.log(sqlFind);
+
+    res.json({ count: resultCount[0][0]["recNum"], cards: results[0] });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 
 
 
