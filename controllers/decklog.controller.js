@@ -89,3 +89,21 @@ exports.search = async (req, res) => {
     console.log(error);
   }
 };
+
+
+exports.add_deck = async (req, res) => {
+  try {
+    const table = "deck_dev";
+    const deck = req.body;
+    const sql = `INSERT INTO ${table} (deck_hash, deck_name, cards_sku) VALUES (?, ?, ?)`;
+    const results = await db
+      .promise()
+      .query(sql, [deck.hash, deck.name, deck.cards_sku]
+    );
+  
+    res.json(results[0]);
+    console.log(deck);
+  } catch (error) {
+    console.log(error);
+  }
+};
