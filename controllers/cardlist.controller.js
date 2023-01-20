@@ -3,14 +3,13 @@ const db = require("../database");
 exports.card_list_home = async (req, res) => {
   try {
     const type = req.type;
-    // example for @claudia
     const table = type.includes("oracle")
       ? process.env.ORACLECARDTABLE
       : process.env.PRINTEDCARDTABLE;
     const results = await db
       .promise()
       .query(
-        `SELECT id, SKU, name, CONVERT (text USING utf8) AS text, flavor, category, image, grade, nation, rarity, race, critical, illustrator, power, regulation, shield, skill, trigger_text, type FROM ${table} ORDER BY last_update LIMIT 9`
+        `SELECT id, SKU, name, CONVERT (text USING utf8) AS text, flavor, category, image, grade, nation, rarity, race, critical, illustrator, power, regulation, shield, skill, trigger_text, gift, sentinel, type FROM ${table} ORDER BY last_update LIMIT 9`
       );
     res.json(results[0]);
   } catch (error) {
@@ -66,7 +65,7 @@ exports.card_detail = async (req, res) => {
       ? process.env.ORACLECARDTABLE
       : process.env.PRINTEDCARDTABLE;
     const card_id = req.params.id;
-    const sql = `SELECT id, SKU, name, CONVERT (text USING utf8) AS text, flavor, category, image, image2, grade, nation, rarity, race, critical, illustrator, power, regulation, shield, skill, trigger_text, type, finishing FROM ${table} WHERE id = ?`;
+    const sql = `SELECT id, SKU, name, CONVERT (text USING utf8) AS text, flavor, category, image, image2, grade, nation, rarity, race, critical, illustrator, power, regulation, shield, skill, trigger_text, gift, sentinel, type, finishing FROM ${table} WHERE id = ?`;
     const results = await db.promise().query(sql, card_id);
     res.json(results[0]);
   } catch (error) {
@@ -81,7 +80,7 @@ exports.card_detail2 = async (req, res) => {
       ? process.env.ORACLECARDTABLE
       : process.env.PRINTEDCARDTABLE;
     const card_sku = req.params.sku;
-    const sql = `SELECT id, SKU, name, CONVERT (text USING utf8) AS text, flavor, category, image, image2, grade, nation, rarity, race, critical, illustrator, power, regulation, shield, skill, trigger_text, type, finishing FROM ${table} WHERE REPLACE(SKU,'/','-') LIKE '%${card_sku}%'`;
+    const sql = `SELECT id, SKU, name, CONVERT (text USING utf8) AS text, flavor, category, image, image2, grade, nation, rarity, race, critical, illustrator, power, regulation, shield, skill, trigger_text, gift, sentinel, type, finishing FROM ${table} WHERE REPLACE(SKU,'/','-') LIKE '%${card_sku}%'`;
     const results = await db.promise().query(sql);
     res.json(results[0]);
   } catch (error) {
@@ -110,7 +109,7 @@ exports.add_card = async (req, res) => {
       ? process.env.ORACLECARDTABLE
       : process.env.PRINTEDCARDTABLE;
     const card = req.body;
-    const sql = `INSERT INTO ${table} (SKU, name, text, flavor, category, image, image2, grade, nation, rarity, race, critical, illustrator, power, regulation, shield, skill, trigger_text, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    const sql = `INSERT INTO ${table} (SKU, name, text, flavor, category, image, image2, grade, nation, rarity, race, critical, illustrator, power, regulation, shield, skill, trigger_text, gift, sentinel, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
     const results = await db
       .promise()
       .query(sql, [
@@ -132,6 +131,8 @@ exports.add_card = async (req, res) => {
         parseInt(card.shield),
         card.skill,
         card.triggerType,
+        card.gift,
+        card.sentinel,
         card.type,
       ]);
 
@@ -166,7 +167,7 @@ exports.edit_card = async (req, res) => {
     const card = req.body;
     const card_id = req.params.id;
     console.log(card_id);
-    const sql = `UPDATE ${table} SET SKU = ?, name = ?, text = ?, flavor = ?, category = ?, image = ?, image2 = ?, grade = ?, nation = ?, rarity = ?, race = ?, critical = ?, illustrator = ?, power = ?, regulation = ?, shield = ?, skill = ?, trigger_text = ?, type = ? WHERE id = ?`;
+    const sql = `UPDATE ${table} SET SKU = ?, name = ?, text = ?, flavor = ?, category = ?, image = ?, image2 = ?, grade = ?, nation = ?, rarity = ?, race = ?, critical = ?, illustrator = ?, power = ?, regulation = ?, shield = ?, skill = ?, trigger_text = ?, gift = ? , sentinel = ?, , type = ? WHERE id = ?`;
     const results = await db
       .promise()
       .query(sql, [
@@ -188,6 +189,8 @@ exports.edit_card = async (req, res) => {
         parseInt(card.shield),
         card.skill,
         card.triggerType,
+        card.gift,
+        card.sentinel,
         card.type,
         card_id,
       ]);
@@ -473,7 +476,7 @@ exports.find_card_with_filter = async (req, res) => {
 
 
 exports.find_advance = async (req, res) => {
-  // http://localhost:3001/cardlist/oracle/find_advance/1/?name=&text=&power=&shield=&race=&flavor=&illustrator=&set=&grade=&rarity=&unitType=&trigger=&finishing=&orderBy=
+  // http://localhost:3001/cardlist/oracle/find_advance/1/?name=&text=&power=&shield=&race=&flavor=&illustrator=&set=&grade=&rarity=&unitType=&gift=&finishing=&orderBy=
   try {
     console.log(req.query)
     const table = req.type.includes("oracle")
@@ -498,8 +501,8 @@ exports.find_advance = async (req, res) => {
     const rarityArr = rarity.split(",").map((e) => `'${e}'`);
     const unitType = req.query.unitType;
     const unitTypeArr = unitType.split(",").map((e) => `'${e}'`);
-    const trigger = req.query.trigger;
-    const triggerArr = trigger.split(",");
+    const gift = req.query.gift;
+    const giftArr = gift.split(",");
     const finishing = req.query.finishing;
     const finishingArr = finishing.split(",");
     const orderBy = req.query.orderBy;
@@ -605,12 +608,12 @@ exports.find_advance = async (req, res) => {
       sqlFind += `AND (type in (${unitTypeArr}))`
     }
 
-    if (trigger) {
+    if (gift) {
       sqlCount += `AND ( FALSE `;
       sqlFind += `AND ( FALSE `;
-      triggerArr.forEach(val => {
-        sqlCount += `OR trigger_text LIKE '%${val}%' `;
-        sqlFind += `OR trigger_text LIKE '%${val}%' `;
+      giftArr.forEach(val => {
+        sqlCount += `OR gift LIKE '%${val}%' `;
+        sqlFind += `OR gift LIKE '%${val}%' `;
         });
       sqlCount += `) `;
       sqlFind += `) `;
