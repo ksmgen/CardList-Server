@@ -95,10 +95,10 @@ exports.add_deck = async (req, res) => {
   try {
     const table = "deck_dev";
     const deck = req.body;
-    const sql = `INSERT INTO ${table} (deck_hash, deck_name, cards_sku) VALUES (?, ?, ?)`;
+    const sql = `INSERT INTO ${table} (deck_hash, deck_name, cards_sku, nation, types_qty, grades_qty) VALUES (?, ?, ?, ?, ?, ?)`;
     const results = await db
       .promise()
-      .query(sql, [deck.hash, deck.name, deck.cards_sku]
+      .query(sql, [deck.hash, deck.name, deck.cards_sku, deck.nation, deck.types_qty, deck.grades_qty]
     );
   
     res.json(results[0]);
@@ -107,3 +107,15 @@ exports.add_deck = async (req, res) => {
     console.log(error);
   }
 };
+
+exports.deck_details = async (req, res) => {
+  try {
+    const table = "deck_dev";
+    const deck_hash = req.params.deck_hash;
+    const sql = `SELECT * FROM ${table} WHERE deck_hash = ?`;
+    const results = await db.promise().query(sql, [deck_hash]);
+    res.json(results[0]);
+  } catch (error) {
+    console.log(error);
+  }
+}
