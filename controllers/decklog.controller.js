@@ -13,7 +13,27 @@ exports.decklog = async (req, res) => {
 
 exports.get_all_cards = async (req, res) => {
   try {
-    const results = await db.promise().query(`SELECT * FROM oracle_cards_dev`);
+    const table = "oracle_cards_vairina";
+    const query = `SELECT SKU, image, grade, type
+                  FROM ${table}
+                  WHERE published = 1
+                  ORDER BY SKU`;
+    const results = await db.promise().query(query);
+    res.json(results[0]);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+exports.get_cards_by_sku = async (req, res) => {
+  try {
+    const table = "oracle_cards_vairina";
+    const sku = req.params.sku;
+    const query = `SELECT *, CONVERT (text USING utf8) as text2
+                  FROM ${table}
+                  WHERE REPLACE(SKU,'/','-') LIKE '%${sku}%'`;
+    const results = await db.promise().query(query);
+
     res.json(results[0]);
   } catch (error) {
     console.log(error);
@@ -95,10 +115,10 @@ exports.add_deck = async (req, res) => {
   try {
     const table = "deck_dev";
     const deck = req.body;
-    const sql = `INSERT INTO ${table} (deck_hash, deck_name, cards_sku, nation, types_qty, grades_qty) VALUES (?, ?, ?, ?, ?, ?)`;
+    const sql = `INSERT INTO ${table} (deck_hash, deck_name, cards, total_cards, nation, types_qty, grades_qty) VALUES (?, ?, ?, ?, ?, ?, ?)`;
     const results = await db
       .promise()
-      .query(sql, [deck.hash, deck.name, deck.cards_sku, deck.nation, deck.types_qty, deck.grades_qty]
+      .query(sql, [deck.hash, deck.name, deck.cards, deck.total_cards, deck.nation, deck.types_qty, deck.grades_qty]
     );
   
     res.json(results[0]);
