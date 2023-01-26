@@ -9,7 +9,7 @@ exports.card_list_home = async (req, res) => {
     const results = await db
       .promise()
       .query(
-        `SELECT id, SKU, name, CONVERT (text USING utf8) AS text, flavor, category, image, grade, nation, rarity, race, critical, illustrator, power, regulation, shield, skill, trigger_text, gift, sentinel, type FROM ${table} ORDER BY last_update LIMIT 9`
+        `SELECT id, SKU, name, CONVERT (text USING utf8) AS text, flavor, category, image, image2, grade, nation, rarity, race, critical, illustrator, power, regulation, shield, skill, trigger_text, gift, sentinel, type, finishing FROM ${table} ORDER BY last_update LIMIT 9`
       );
     res.json(results[0]);
   } catch (error) {
@@ -474,11 +474,10 @@ exports.find_card_with_filter = async (req, res) => {
   }
 };
 
-
 exports.find_advance = async (req, res) => {
   // http://localhost:3001/cardlist/oracle/find_advance/1/?name=&text=&power=&shield=&race=&flavor=&illustrator=&set=&grade=&rarity=&unitType=&gift=&finishing=&orderBy=
   try {
-    console.log(req.query)
+    console.log(req.query);
     const table = req.type.includes("oracle")
       ? process.env.ORACLECARDTABLE
       : process.env.PRINTEDCARDTABLE;
@@ -516,11 +515,11 @@ exports.find_advance = async (req, res) => {
     let sqlFind = `  SELECT  *, CONVERT (text USING utf8) as text2
                       FROM    ${table}
                       WHERE   (published = 1) `;
-    
+
     if (name) {
       sqlCount += `AND ( FALSE `;
       sqlFind += `AND ( FALSE `;
-      nameArr.forEach(val => {
+      nameArr.forEach((val) => {
         sqlCount += `OR LOWER(name) LIKE '%${val}%' `;
         sqlFind += `OR LOWER(name) LIKE '%${val}%' `;
       });
@@ -531,7 +530,7 @@ exports.find_advance = async (req, res) => {
     if (text) {
       sqlCount += `AND ( FALSE `;
       sqlFind += `AND ( FALSE `;
-      textArr.forEach(val => {
+      textArr.forEach((val) => {
         sqlCount += `OR LOWER(CONVERT (text USING utf8)) LIKE '%${val}%' `;
         sqlFind += `OR LOWER(CONVERT (text USING utf8)) LIKE '%${val}%' `;
       });
@@ -540,19 +539,19 @@ exports.find_advance = async (req, res) => {
     }
 
     if (power) {
-      sqlCount += `AND (power in (${power}))`
-      sqlFind += `AND (power in (${power}))`
+      sqlCount += `AND (power in (${power}))`;
+      sqlFind += `AND (power in (${power}))`;
     }
 
     if (shield) {
-      sqlCount += `AND (shield in (${shield}))`
-      sqlFind += `AND (shield in (${shield}))`
+      sqlCount += `AND (shield in (${shield}))`;
+      sqlFind += `AND (shield in (${shield}))`;
     }
 
     if (race) {
       sqlCount += `AND ( FALSE `;
       sqlFind += `AND ( FALSE `;
-      raceArr.forEach(val => {
+      raceArr.forEach((val) => {
         sqlCount += `OR LOWER(race) LIKE '%${val}%' `;
         sqlFind += `OR LOWER(race) LIKE '%${val}%' `;
       });
@@ -563,7 +562,7 @@ exports.find_advance = async (req, res) => {
     if (flavor) {
       sqlCount += `AND ( FALSE `;
       sqlFind += `AND ( FALSE `;
-      flavorArr.forEach(val => {
+      flavorArr.forEach((val) => {
         sqlCount += `OR LOWER(flavor) LIKE '%${val}%' `;
         sqlFind += `OR LOWER(flavor) LIKE '%${val}%' `;
       });
@@ -574,7 +573,7 @@ exports.find_advance = async (req, res) => {
     if (illustrator) {
       sqlCount += `AND ( FALSE `;
       sqlFind += `AND ( FALSE `;
-      illustratorArr.forEach(val => {
+      illustratorArr.forEach((val) => {
         sqlCount += `OR illustrator LIKE '%${val}%' `;
         sqlFind += `OR illustrator LIKE '%${val}%' `;
       });
@@ -585,36 +584,36 @@ exports.find_advance = async (req, res) => {
     if (set) {
       sqlCount += `AND ( FALSE `;
       sqlFind += `AND ( FALSE `;
-      setArr.forEach(val => {
+      setArr.forEach((val) => {
         sqlCount += `OR category LIKE '%${val}%' `;
         sqlFind += `OR category LIKE '%${val}%' `;
-        });
+      });
       sqlCount += `) `;
       sqlFind += `) `;
     }
 
     if (grade) {
       sqlCount += `AND (grade in (${grade}))`;
-      sqlFind +=`AND (grade in (${grade}))`;
+      sqlFind += `AND (grade in (${grade}))`;
     }
 
     if (rarity) {
-      sqlCount += `AND (rarity in (${rarityArr}))`
-      sqlFind += `AND (rarity in (${rarityArr}))`
+      sqlCount += `AND (rarity in (${rarityArr}))`;
+      sqlFind += `AND (rarity in (${rarityArr}))`;
     }
 
     if (unitType) {
-      sqlCount += `AND (type in (${unitTypeArr}))`
-      sqlFind += `AND (type in (${unitTypeArr}))`
+      sqlCount += `AND (type in (${unitTypeArr}))`;
+      sqlFind += `AND (type in (${unitTypeArr}))`;
     }
 
     if (gift) {
       sqlCount += `AND ( FALSE `;
       sqlFind += `AND ( FALSE `;
-      giftArr.forEach(val => {
+      giftArr.forEach((val) => {
         sqlCount += `OR gift LIKE '%${val}%' `;
         sqlFind += `OR gift LIKE '%${val}%' `;
-        });
+      });
       sqlCount += `) `;
       sqlFind += `) `;
     }
@@ -626,10 +625,10 @@ exports.find_advance = async (req, res) => {
       for (let i = 0; i < finishingArr.length; i++) {
         currentFinishing = finishingArr[i];
         if (currentFinishing == "Stamped") {
-            // based on current database, cards with "Stamped" finishing do not have "Foil + Stamped" finishing
-            // but cards with "Foil" finishing do have "Foil + Stamped" finishing too
-            sqlCount += `OR finishing LIKE '%${currentFinishing}%' AND finishing NOT LIKE '%Foil + Stamped%' `;
-            sqlFind += `OR finishing LIKE '%${currentFinishing}%' AND finishing NOT LIKE '%Foil + Stamped%' `;
+          // based on current database, cards with "Stamped" finishing do not have "Foil + Stamped" finishing
+          // but cards with "Foil" finishing do have "Foil + Stamped" finishing too
+          sqlCount += `OR finishing LIKE '%${currentFinishing}%' AND finishing NOT LIKE '%Foil + Stamped%' `;
+          sqlFind += `OR finishing LIKE '%${currentFinishing}%' AND finishing NOT LIKE '%Foil + Stamped%' `;
         } else {
           sqlCount += `OR finishing LIKE '%${currentFinishing}%' `;
           sqlFind += `OR finishing LIKE '%${currentFinishing}%' `;
@@ -638,7 +637,6 @@ exports.find_advance = async (req, res) => {
       sqlCount += `) `;
       sqlFind += `) `;
     }
-
 
     if (orderBy) {
       sqlFind += `ORDER BY ${orderBy.toLowerCase()} LIMIT 50 OFFSET ${offset}`;
@@ -655,17 +653,15 @@ exports.find_advance = async (req, res) => {
   } catch (error) {
     console.log(error);
   }
-
 };
 
 exports.find_quick = async (req, res) => {
   // search from navbar
   try {
-    console.log(req.query)
-    const table =
-      req.type.includes("oracle")
-        ? process.env.ORACLECARDTABLE
-        : process.env.PRINTEDCARDTABLE;
+    console.log(req.query);
+    const table = req.type.includes("oracle")
+      ? process.env.ORACLECARDTABLE
+      : process.env.PRINTEDCARDTABLE;
     const keyword = req.query.keyword;
     const page = req.params.page;
     const offset = page * 50 - 50;
@@ -685,8 +681,7 @@ exports.find_quick = async (req, res) => {
     sqlFind += `ORDER BY id LIMIT 50 OFFSET ${offset}`;
 
     const resultCount = await db.promise().query(sqlCount);
-    const results = await db.promise().
-    query(sqlFind);
+    const results = await db.promise().query(sqlFind);
 
     console.log(sqlFind);
 
@@ -695,9 +690,3 @@ exports.find_quick = async (req, res) => {
     console.log(error);
   }
 };
-
-
-
-
-
-
