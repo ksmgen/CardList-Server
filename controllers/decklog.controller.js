@@ -14,7 +14,7 @@ exports.decklog = async (req, res) => {
 exports.get_all_cards = async (req, res) => {
   try {
     const table = "oracle_cards_vairina";
-    const query = `SELECT SKU, image, grade, type
+    const query = `SELECT SKU, image, grade, type, gift, sentinel
                   FROM ${table}
                   WHERE published = 1
                   ORDER BY SKU`;
@@ -58,9 +58,10 @@ exports.search = async (req, res) => {
   const table = "oracle_cards_vairina";
 
   try {
-    let sql = ` SELECT  *, CONVERT (text USING utf8) as text2
-                FROM    ${table} 
-                WHERE   (published = 1) `;
+    let sql = ` SELECT SKU, image, grade, type, gift, sentinel
+                FROM ${table}
+                WHERE published = 1
+              `;
     
     if (nation) {
       sql += `AND (nation = '${nation}') `;
