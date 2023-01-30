@@ -9,7 +9,7 @@ exports.card_list_home = async (req, res) => {
     const results = await db
       .promise()
       .query(
-        `SELECT id, SKU, name, CONVERT (text USING utf8) AS text, flavor, category, image, image2, grade, nation, rarity, race, critical, illustrator, power, regulation, shield, skill, trigger_text, gift, sentinel, type, finishing FROM ${table} ORDER BY last_update LIMIT 9`
+        `SELECT  *, CONVERT (text USING utf8) as text2 FROM ${table} ORDER BY last_update LIMIT 9`
       );
     res.json(results[0]);
   } catch (error) {
