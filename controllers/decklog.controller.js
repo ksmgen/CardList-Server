@@ -58,15 +58,12 @@ exports.search = async (req, res) => {
   const table = "oracle_cards_vairina";
 
   try {
-    let sql = ` SELECT SKU, image, grade, type, gift, sentinel
+    let sql = ` SELECT SKU, name, image, grade, type, gift, sentinelm, max_qty
                 FROM ${table}
                 WHERE published = 1
+                AND (nation = '${nation}')
               `;
-    
-    if (nation) {
-      sql += `AND (nation = '${nation}') `;
-    }
-
+  
     if (keyword) {
       sql += `AND (name LIKE '%${keyword}%') `;
     }
