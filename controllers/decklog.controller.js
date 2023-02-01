@@ -58,7 +58,7 @@ exports.search = async (req, res) => {
   const table = "oracle_cards_vairina";
 
   try {
-    let sql = ` SELECT SKU, name, image, grade, type, gift, sentinelm, max_qty
+    let sql = ` SELECT SKU, name, image, grade, type, gift, sentinel, max_qty
                 FROM ${table}
                 WHERE published = 1
                 AND (nation = '${nation}')
