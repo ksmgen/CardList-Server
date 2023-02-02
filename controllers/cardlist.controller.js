@@ -489,6 +489,8 @@ exports.find_advance = async (req, res) => {
     const shield = req.query.shield;
     const race = req.query.race;
     const raceArr = race.split(",");
+    const nation = req.query.nation;
+    const nationArr = nation.split(",");
     const flavor = req.query.flavor;
     const flavorArr = flavor.split(",");
     const illustrator = req.query.illustrator;
@@ -554,6 +556,17 @@ exports.find_advance = async (req, res) => {
       raceArr.forEach((val) => {
         sqlCount += `OR LOWER(race) LIKE '%${val}%' `;
         sqlFind += `OR LOWER(race) LIKE '%${val}%' `;
+      });
+      sqlCount += `) `;
+      sqlFind += `) `;
+    }
+
+    if (nation) {
+      sqlCount += `AND ( FALSE `;
+      sqlFind += `AND ( FALSE `;
+      nationArr.forEach(val => {
+        sqlCount += `OR LOWER(nation) LIKE '%${val}%' `;
+        sqlFind += `OR LOWER(nation) LIKE '%${val}%' `;
       });
       sqlCount += `) `;
       sqlFind += `) `;
