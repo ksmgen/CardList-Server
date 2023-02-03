@@ -53,7 +53,7 @@ exports.search = async (req, res) => {
   const maxPower = req.query.maxPower;
   const rarity = req.query.rarity;
   const triggers = req.query.triggers;
-  const triggersArr = triggers.split(",").map((e) => `'${e}'`);
+  const triggersArr = triggers.split(",");
 
   const table = "oracle_cards_vairina";
 
@@ -91,7 +91,7 @@ exports.search = async (req, res) => {
     if (triggers) {
       sql += `AND ( FALSE `;
       triggersArr.forEach(val => {
-        sql += `OR trigger_text LIKE '%${val}%' `;
+        sql += `OR (trigger_text LIKE '%${val}%') `;
         });
       sql += `) `;
     }
