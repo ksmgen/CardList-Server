@@ -1,8 +1,10 @@
 const db = require("../database");
+const deckTable = process.env.DECKTABLE; 
+const oracleTable = process.env.ORACLECARDTABLE;
 
 exports.decklog = async (req, res) => {
   try {
-    const results = await db.promise().query(`SELECT * FROM deck_dev`);
+    const results = await db.promise().query(`SELECT * FROM ${deckTable}`);
     res.json(results[0]);
     // console.log(JSON.parse(results[0][1].cards_sku)); jadi array
     // console.log(JSON.parse(results[0][1].cards_sku)[0]); bisa langsung diakses
@@ -13,9 +15,9 @@ exports.decklog = async (req, res) => {
 
 exports.get_all_cards = async (req, res) => {
   try {
-    const table = "oracle_cards_vairina";
+    // const table = "oracle_cards_vairina";
     const query = `SELECT SKU, image, grade, type, gift, sentinel
-                  FROM ${table}
+                  FROM ${oracleTable}
                   WHERE published = 1
                   ORDER BY SKU`;
     const results = await db.promise().query(query);
@@ -27,10 +29,10 @@ exports.get_all_cards = async (req, res) => {
 
 exports.get_cards_by_sku = async (req, res) => {
   try {
-    const table = "oracle_cards_vairina";
+    // const table = "oracle_cards_vairina";
     const sku = req.params.sku;
     const query = `SELECT *, CONVERT (text USING utf8) as text2
-                  FROM ${table}
+                  FROM ${oracleTable}
                   WHERE REPLACE(SKU,'/','-') LIKE '%${sku}%'`;
     const results = await db.promise().query(query);
 
@@ -55,11 +57,11 @@ exports.search = async (req, res) => {
   const triggers = req.query.triggers;
   const triggersArr = triggers.split(",");
 
-  const table = "oracle_cards_vairina";
+  // const table = "oracle_cards_vairina";
 
   try {
     let sql = ` SELECT SKU, name, image, grade, type, gift, sentinel, max_qty
-                FROM ${table}
+                FROM ${oracleTable}
                 WHERE published = 1
                 AND (nation = '${nation}')
               `;
@@ -111,9 +113,9 @@ exports.search = async (req, res) => {
 
 exports.add_deck = async (req, res) => {
   try {
-    const table = "deck_dev";
+    // const table = "deck_dev";
     const deck = req.body;
-    const sql = `INSERT INTO ${table} (deck_hash, deck_name, cards, total_cards, nation, types_qty, grades_qty) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+    const sql = `INSERT INTO ${deckTable} (deck_hash, deck_name, cards, total_cards, nation, types_qty, grades_qty) VALUES (?, ?, ?, ?, ?, ?, ?)`;
     const results = await db
       .promise()
       .query(sql, [deck.hash, deck.name, deck.cards, deck.total_cards, deck.nation, deck.types_qty, deck.grades_qty]
@@ -128,9 +130,9 @@ exports.add_deck = async (req, res) => {
 
 exports.deck_details = async (req, res) => {
   try {
-    const table = "deck_dev";
+    // const table = "deck_dev";
     const deck_hash = req.params.deck_hash;
-    const sql = `SELECT * FROM ${table} WHERE deck_hash = ?`;
+    const sql = `SELECT * FROM ${deckTable} WHERE deck_hash = ?`;
     const results = await db.promise().query(sql, [deck_hash]);
     res.json(results[0]);
   } catch (error) {
