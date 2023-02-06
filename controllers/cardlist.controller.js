@@ -380,7 +380,7 @@ exports.find_card_with_filter = async (req, res) => {
     const paramChecked = req.params.paramChecked;
     const nation = req.query.nation;
     const orderBy = req.query.orderBy;
-    const set = req.query.set;
+    const cardSet = req.query.cardSet;
     const grade = req.query.grade;
     const givenFinishing = req.query.finishing;
     const givenFinishingArr = givenFinishing.split(",");
@@ -400,9 +400,9 @@ exports.find_card_with_filter = async (req, res) => {
       sqlFind += `AND nation = '${nation}' `;
     }
 
-    if (set) {
-      sqlCount += `AND category LIKE '%${set}%' `;
-      sqlFind += `AND category LIKE '%${set}%' `;
+    if (cardSet) {
+      sqlCount += `AND category LIKE '%${cardSet}%' `;
+      sqlFind += `AND category LIKE '%${cardSet}%' `;
     }
 
     if (card_type) {
