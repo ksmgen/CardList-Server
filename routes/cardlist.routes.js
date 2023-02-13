@@ -20,6 +20,7 @@ import {
   find_card_with_filter,
   find_advance,
   find_quick,
+  card_list_all_cards,
 } from "../controllers/cardlist.controller";
 
 import { getOracle } from "../controllers/cl2u-link.controller";
@@ -39,6 +40,15 @@ router.get(
     next();
   },
   card_list_home
+);
+
+router.get(
+  "/:type/allcards",
+  (req, res, next) => {
+    req.type = req.params.type;
+    next();
+  },
+  card_list_all_cards
 );
 router.get(
   "/:type/total_pages",

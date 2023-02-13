@@ -17,6 +17,23 @@ exports.card_list_home = async (req, res) => {
   }
 };
 
+exports.card_list_all_cards = async (req, res) => {
+  try {
+    const type = req.type;
+    const table = type.includes("oracle")
+      ? process.env.ORACLECARDTABLE
+      : process.env.PRINTEDCARDTABLE;
+    const results = await db
+      .promise()
+      .query(
+        `SELECT  *, CONVERT (text USING utf8) as text2 FROM ${table} ORDER BY id`
+      );
+    res.json(results[0]);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 exports.card_list_pagination = async (req, res) => {
   try {
     const type = req.type;
@@ -65,7 +82,7 @@ exports.card_detail = async (req, res) => {
       ? process.env.ORACLECARDTABLE
       : process.env.PRINTEDCARDTABLE;
     const card_id = req.params.id;
-    const sql = `SELECT id, SKU, name, CONVERT (text USING utf8) AS text, flavor, category, image, image2, grade, nation, rarity, race, critical, illustrator, power, regulation, shield, skill, trigger_text, gift, sentinel, type, finishing FROM ${table} WHERE id = ?`;
+    const sql = `SELECT id, SKU, name, published, CONVERT (text USING utf8) AS text, flavor, category, image, image2, grade, nation, rarity, race, critical, illustrator, power, regulation, shield, skill, trigger_text, type, subtype, sentinel, gift, finishing, url_slug FROM ${table} WHERE id = ?`;
     const results = await db.promise().query(sql, card_id);
     res.json(results[0]);
   } catch (error) {
@@ -109,12 +126,13 @@ exports.add_card = async (req, res) => {
       ? process.env.ORACLECARDTABLE
       : process.env.PRINTEDCARDTABLE;
     const card = req.body;
-    const sql = `INSERT INTO ${table} (SKU, name, text, flavor, category, image, image2, grade, nation, rarity, race, critical, illustrator, power, regulation, shield, skill, trigger_text, gift, sentinel, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    const sql = `INSERT INTO ${table} (SKU, name, published, text, flavor, category, image, image2, grade, nation, rarity, race, critical, illustrator, power, regulation, shield, skill, trigger_text, type, subtype, sentinel, gift, finishing, slug) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
     const results = await db
       .promise()
       .query(sql, [
         card.SKU,
         card.name,
+        parseInt(card.published),
         card.text,
         card.flavor,
         card.category,
@@ -131,9 +149,12 @@ exports.add_card = async (req, res) => {
         parseInt(card.shield),
         card.skill,
         card.triggerType,
-        card.gift,
-        card.sentinel,
         card.type,
+        card.subtype,
+        card.sentinel,
+        card.gift,
+        card.finishing,
+        card.slug,
       ]);
 
     res.json(results[0]);
@@ -167,12 +188,13 @@ exports.edit_card = async (req, res) => {
     const card = req.body;
     const card_id = req.params.id;
     console.log(card_id);
-    const sql = `UPDATE ${table} SET SKU = ?, name = ?, text = ?, flavor = ?, category = ?, image = ?, image2 = ?, grade = ?, nation = ?, rarity = ?, race = ?, critical = ?, illustrator = ?, power = ?, regulation = ?, shield = ?, skill = ?, trigger_text = ?, gift = ? , sentinel = ?, , type = ? WHERE id = ?`;
+    const sql = `UPDATE ${table} SET SKU = ?, name = ?, published = ?, text = ?, flavor = ?, category = ?, image = ?, image2 = ?, grade = ?, nation = ?, rarity = ?, race = ?, critical = ?, illustrator = ?, power = ?, regulation = ?, shield = ?, skill = ?, trigger_text = ?, type = ?, subtype = ?, sentinel = ?, gift = ?, finishing = ?, url_slug = ?  WHERE id = ?`;
     const results = await db
       .promise()
       .query(sql, [
         card.SKU,
         card.name,
+        parseInt(card.published),
         card.text,
         card.flavor,
         card.category,
@@ -188,10 +210,13 @@ exports.edit_card = async (req, res) => {
         card.regulation,
         parseInt(card.shield),
         card.skill,
-        card.triggerType,
-        card.gift,
-        card.sentinel,
+        card.triggerText,
         card.type,
+        card.subtype,
+        card.sentinel,
+        card.gift,
+        card.finishing,
+        card.slug,
         card_id,
       ]);
 
@@ -564,7 +589,7 @@ exports.find_advance = async (req, res) => {
     if (nation) {
       sqlCount += `AND ( FALSE `;
       sqlFind += `AND ( FALSE `;
-      nationArr.forEach(val => {
+      nationArr.forEach((val) => {
         sqlCount += `OR LOWER(nation) LIKE '%${val}%' `;
         sqlFind += `OR LOWER(nation) LIKE '%${val}%' `;
       });
