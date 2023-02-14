@@ -1,11 +1,15 @@
 const db = require("../database");
 
+const oracleTable = process.env.ORACLECARDTABLE;
+const printedCardTable = process.env.PRINTEDCARDTABLE;
+const todayCardTable = process.env.TODAYCARDTABLE;
+
 exports.card_list_home = async (req, res) => {
   try {
     const type = req.type;
     const table = type.includes("oracle")
-      ? process.env.ORACLECARDTABLE
-      : process.env.PRINTEDCARDTABLE;
+      ? oracleTable
+      : printedCardTable;
     const results = await db
       .promise()
       .query(
@@ -21,8 +25,8 @@ exports.card_list_pagination = async (req, res) => {
   try {
     const type = req.type;
     const table = type.includes("oracle")
-      ? process.env.ORACLECARDTABLE
-      : process.env.PRINTEDCARDTABLE;
+      ? oracleTable
+      : printedCardTable;
     const page = req.params.page;
     const offset = 50 * page - 50;
     const sqlCount = `  SELECT  COUNT(*) as recNum
@@ -46,8 +50,8 @@ exports.card_list_total_pages = async (req, res) => {
   try {
     const type = req.type;
     const table = type.includes("oracle")
-      ? process.env.ORACLECARDTABLE
-      : process.env.PRINTEDCARDTABLE;
+      ? oracleTable
+      : printedCardTable;
     const results = await db.promise().query(
       ` SELECT  COUNT(*) as recNum
           FROM    ${table}`
@@ -62,8 +66,8 @@ exports.card_detail = async (req, res) => {
   try {
     const type = req.type;
     const table = type.includes("oracle")
-      ? process.env.ORACLECARDTABLE
-      : process.env.PRINTEDCARDTABLE;
+      ? oracleTable
+      : printedCardTable;
     const card_id = req.params.id;
     const sql = `SELECT id, SKU, name, CONVERT (text USING utf8) AS text, flavor, category, image, image2, grade, nation, rarity, race, critical, illustrator, power, regulation, shield, skill, trigger_text, gift, sentinel, type, finishing FROM ${table} WHERE id = ?`;
     const results = await db.promise().query(sql, card_id);
@@ -77,8 +81,8 @@ exports.card_detail2 = async (req, res) => {
   try {
     const type = req.type;
     const table = type.includes("oracle")
-      ? process.env.ORACLECARDTABLE
-      : process.env.PRINTEDCARDTABLE;
+      ? oracleTable
+      : printedCardTable;
     const card_sku = req.params.sku;
     const sql = `SELECT id, SKU, name, CONVERT (text USING utf8) AS text, flavor, category, image, image2, grade, nation, rarity, race, critical, illustrator, power, regulation, shield, skill, trigger_text, gift, sentinel, type, finishing FROM ${table} WHERE REPLACE(SKU,'/','-') LIKE '%${card_sku}%'`;
     const results = await db.promise().query(sql);
@@ -92,8 +96,8 @@ exports.card_category = async (req, res) => {
   try {
     const type = req.type;
     const table = type.includes("oracle")
-      ? process.env.ORACLECARDTABLE
-      : process.env.PRINTEDCARDTABLE;
+      ? oracleTable
+      : printedCardTable;
     const sql = `SELECT DISTINCT category FROM ${table}`;
     const results = await db.promise().query(sql);
     res.json(results[0]);
@@ -106,8 +110,8 @@ exports.add_card = async (req, res) => {
   try {
     const type = req.type;
     const table = type.includes("oracle")
-      ? process.env.ORACLECARDTABLE
-      : process.env.PRINTEDCARDTABLE;
+      ? oracleTable
+      : printedCardTable;
     const card = req.body;
     const sql = `INSERT INTO ${table} (SKU, name, text, flavor, category, image, image2, grade, nation, rarity, race, critical, illustrator, power, regulation, shield, skill, trigger_text, gift, sentinel, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
     const results = await db
@@ -147,8 +151,8 @@ exports.delete_card = async (req, res) => {
   try {
     const type = req.type;
     const table = type.includes("oracle")
-      ? process.env.ORACLECARDTABLE
-      : process.env.PRINTEDCARDTABLE;
+      ? oracleTable
+      : printedCardTable;
     const card_id = req.params.id;
     const sql = `DELETE FROM ${table} WHERE id = ?`;
     const results = await db.promise().query(sql, card_id);
@@ -162,8 +166,8 @@ exports.edit_card = async (req, res) => {
   try {
     const type = req.type;
     const table = type.includes("oracle")
-      ? process.env.ORACLECARDTABLE
-      : process.env.PRINTEDCARDTABLE;
+      ? oracleTable
+      : printedCardTable;
     const card = req.body;
     const card_id = req.params.id;
     console.log(card_id);
@@ -242,8 +246,8 @@ exports.find_card = async (req, res) => {
   try {
     const type = req.type;
     const table = type.includes("oracle")
-      ? process.env.ORACLECARDTABLE
-      : process.env.PRINTEDCARDTABLE;
+      ? oracleTable
+      : printedCardTable;
     const keyword = decodeURI(req.params.keyword).toLowerCase();
     const page = req.params.page;
     const offset = page * 50 - 50;
@@ -282,8 +286,8 @@ exports.find_card2 = async (req, res) => {
   try {
     const type = req.type;
     const table = type.includes("oracle")
-      ? process.env.ORACLECARDTABLE
-      : process.env.PRINTEDCARDTABLE;
+      ? oracleTable
+      : printedCardTable;
     const keyword = decodeURI(req.params.keyword).toLowerCase();
     const param = req.params.param;
     const page = req.params.page;
@@ -326,8 +330,8 @@ exports.get_random_card = async (req, res) => {
   try {
     const type = req.type;
     const table = type.includes("oracle")
-      ? process.env.ORACLECARDTABLE
-      : process.env.PRINTEDCARDTABLE;
+      ? oracleTable
+      : printedCardTable;
     const sql = ` SELECT  *, CONVERT (text USING utf8) as text2
                   FROM    ${table}
                   WHERE (published = 1)
@@ -346,8 +350,8 @@ exports.get_set_card = async (req, res) => {
   try {
     const type = req.type;
     const table = type.includes("oracle")
-      ? process.env.ORACLECARDTABLE
-      : process.env.PRINTEDCARDTABLE;
+      ? oracleTable
+      : printedCardTable;
     const keyword = decodeURI(req.params.keyword).toLowerCase();
     const page = req.params.page;
     const offset = page * 50 - 50;
@@ -363,6 +367,8 @@ exports.get_set_card = async (req, res) => {
     const resultc = await db.promise().query(sqlc);
     const result = await db.promise().query(sql);
 
+    console.log(sql);
+
     res.json({ count: resultc[0][0]["recNum"], cards: result[0] });
   } catch (error) {
     console.log(error);
@@ -374,8 +380,8 @@ exports.find_card_with_filter = async (req, res) => {
     console.log(req.query);
     const type = req.type;
     const table = type.includes("oracle")
-      ? process.env.ORACLECARDTABLE
-      : process.env.PRINTEDCARDTABLE;
+      ? oracleTable
+      : printedCardTable;
     const keyword = req.query.keyword;
     const paramChecked = req.params.paramChecked;
     const nation = req.query.nation;
@@ -479,8 +485,8 @@ exports.find_advance = async (req, res) => {
   try {
     console.log(req.query);
     const table = req.type.includes("oracle")
-      ? process.env.ORACLECARDTABLE
-      : process.env.PRINTEDCARDTABLE;
+      ? oracleTable
+      : printedCardTable;
     const name = req.query.name;
     const nameArr = name.split(",");
     const text = req.query.text;
@@ -673,8 +679,8 @@ exports.find_quick = async (req, res) => {
   try {
     console.log(req.query);
     const table = req.type.includes("oracle")
-      ? process.env.ORACLECARDTABLE
-      : process.env.PRINTEDCARDTABLE;
+      ? oracleTable
+      : printedCardTable;
     const keyword = req.query.keyword;
     const page = req.params.page;
     const offset = page * 50 - 50;
@@ -703,3 +709,111 @@ exports.find_quick = async (req, res) => {
     console.log(error);
   }
 };
+
+
+// TODAY CARD --------------------------------------------------
+
+exports.get_all_today_cards = async (req, res) => {
+  try {
+    const table = todayCardTable
+    const sql =
+        `SELECT *,
+        IF(schedule > CURDATE(), 'SCHEDULED', IF(schedule = CURDATE(), 'VIEWING', 'DONE')) as status
+        FROM ${table}
+        ORDER BY schedule DESC`;
+    const results = await db.promise().query(sql);
+    res.json(results[0]);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+exports.get_viewing_today_card = async (req, res) => {
+  try {
+    const table = todayCardTable
+    const sql = `SELECT * FROM ${table} WHERE schedule = CURDATE()`;
+    const results = await db.promise().query(sql);
+    res.json(results[0]);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+exports.add_schedule_today_card = async (req, res) => {
+  console.log(req.body);
+  try {
+    const table = todayCardTable
+    const card = req.body;
+    const sql = `INSERT INTO ${table} (SKU, schedule) VALUES (?, ?)`;
+    const results = await db
+      .promise()
+      .query(sql, [
+        card.SKU,
+        card.schedule
+      ]);
+    res.json(results[0]);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+exports.delete_schedule_today_card = async (req, res) => {
+  try {
+    const table = todayCardTable
+    const id = req.params.id;
+    const sql = `DELETE FROM ${table} WHERE id = ?`;
+    const results = await db.promise().query(sql, [id]);
+    res.json(results[0]);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+exports.update_schedule_today_card = async (req, res) => {
+  try {
+    const table = todayCardTable
+    const id = req.params.id;
+    const card = req.body;
+    const sql = `UPDATE ${table} SET SKU = ?, schedule = ? WHERE id = ?`;
+    const results = await db
+      .promise()
+      .query(sql, [
+        card.SKU,
+        card.schedule,
+        id
+      ]);
+    res.json(results[0]);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+exports.search_today_card = async (req, res) => {
+  const keyword = req.params.keyword;
+  
+  const sql =
+    `SELECT SKU, name, image
+    FROM ${oracleTable}
+    WHERE REPLACE(SKU,'/','-') LIKE '%${keyword}%'
+    ORDER BY SKU ASC
+    LIMIT 5`;
+  
+  console.log(sql);
+  const results = await db.promise().query(sql);
+  res.json(results[0]);
+}
+
+
+exports.get_schedule_by_id = async (req, res) => {
+  try {
+    const table = todayCardTable
+    const id = req.params.id;
+    const sql = `SELECT * FROM ${table} WHERE id = ?`;
+    const results = await db.promise().query(sql, [id]);
+    res.json(results[0]);
+  } catch (error) {
+    console.log(error);
+  }
+}
+  
+  

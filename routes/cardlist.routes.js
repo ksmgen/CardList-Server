@@ -20,6 +20,13 @@ import {
   find_card_with_filter,
   find_advance,
   find_quick,
+  get_all_today_cards,
+  get_viewing_today_card,
+  add_schedule_today_card,
+  delete_schedule_today_card,
+  update_schedule_today_card,
+  search_today_card,
+  get_schedule_by_id,
 } from "../controllers/cardlist.controller";
 
 import { getOracle } from "../controllers/cl2u-link.controller";
@@ -28,6 +35,16 @@ import { json, urlencoded } from "body-parser";
 
 router.use(json());
 router.use(urlencoded({ extended: true }));
+
+// TDOAY CARD
+router.get("/today_card/all",  get_all_today_cards)
+router.get("/today_card/viewing", get_viewing_today_card)
+router.post("/today_card/add_schedule", add_schedule_today_card)
+router.delete("/today_card/delete_schedule/:id", delete_schedule_today_card)
+router.put("/today_card/edit_schedule/:id", update_schedule_today_card)
+router.get("/today_card/search/:keyword", search_today_card)
+router.get("/today_card/schedule/:id", get_schedule_by_id)
+
 
 router.get("/categoryId", categoryId);
 router.get("/category", category);
