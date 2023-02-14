@@ -126,7 +126,7 @@ exports.add_card = async (req, res) => {
       ? process.env.ORACLECARDTABLE
       : process.env.PRINTEDCARDTABLE;
     const card = req.body;
-    const sql = `INSERT INTO ${table} (SKU, name, published, text, flavor, category, image, image2, grade, nation, rarity, race, critical, illustrator, power, regulation, shield, skill, trigger_text, type, subtype, sentinel, gift, finishing, slug) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    const sql = `INSERT INTO ${table} (SKU, name, published, text, flavor, category, image, image2, grade, nation, rarity, race, critical, illustrator, power, regulation, shield, skill, trigger_text, type, subtype, sentinel, gift, finishing, url_slug) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
     const results = await db
       .promise()
       .query(sql, [
