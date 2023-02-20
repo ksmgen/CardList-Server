@@ -1,49 +1,7 @@
+const { json } = require("body-parser");
 const { createCanvas, loadImage } = require("canvas");
 const fs = require("fs");
-
-
-// use deck_details to get deck details
-// then use the details to create the image
-const deck = {
-    "D-BT01/001BH": {
-        "image": "https://cardlist.s3.ap-southeast-1.amazonaws.com/D_BT01_001BH.png",
-        "qty": 3,
-    },
-    "D-BT01/002BH": {
-        "image": "https://cardlist.s3.ap-southeast-1.amazonaws.com/D_BT01_002BH.png",
-        "qty": 3,
-    },
-    "D-BT01/003BH": {
-        "image": "https://cardlist.s3.ap-southeast-1.amazonaws.com/D_BT01_003BH.png",
-        "qty": 1,
-    },
-    "D-BT01/016BH": {
-        "image": "https://cardlist.s3.ap-southeast-1.amazonaws.com/D_BT01_016BH.png",
-        "qty": 3,
-    },
-    "D-BT01/017BH": {
-        "image": "https://cardlist.s3.ap-southeast-1.amazonaws.com/D_BT01_017BH.png",
-        "qty": 1,
-    },
-    "D-BT01/018BH": {
-        "image": "https://cardlist.s3.ap-southeast-1.amazonaws.com/D_BT01_018BH.png",
-        "qty": 4,
-    },
-    "D-BT01/019BH": {
-        "image": "https://cardlist.s3.ap-southeast-1.amazonaws.com/D_BT01_019BH.png",
-        "qty": 4,
-    },
-    "D-BT01/021BH": {
-        "image": "https://cardlist.s3.ap-southeast-1.amazonaws.com/D_BT01_021BH.png",
-        "qty": 4,
-    }
-
-}
-
-
-const deckName = "Decknya Liza"
-const deckCode = "ABCDEF"
-const deckNation = "Dragon Empire"
+const upload = require("./uploadFile");
 
 
 const width = 1200;
@@ -51,14 +9,25 @@ const height = 627;
 const canvas = createCanvas(width, height);
 const context = canvas.getContext("2d");
 
+function dataURItoUint8Array(dataURI) {
+    var binary = atob(dataURI.split(',')[1]);
+    var array = [];
+    for(var i = 0; i < binary.length; i++) {
+        array.push(binary.charCodeAt(i));
+    }
+    return new Uint8Array(array);
+}
+
 // recursive function to load all the images then save to buffer
-const loadImages = (sources, x, y) => {
+const loadImages = (title, sources, x, y) => {
     if (sources.length === 0) {
-        const buffer = canvas.toBuffer("image/png");
-        fs.writeFileSync("./deckImage/deck.png", buffer)
+        var dataUrl = canvas.toDataURL("image/png");
+        var arrayData = dataURItoUint8Array(dataUrl);
+        var image_result = upload(`${title}.png`, arrayData)
+        return image_result
     } else {
-        qty = sources[0].qty
-        img = sources[0].image
+        const qty = sources[0].qty
+        const img = sources[0].image
         loadImage(img).then((card) => {
             console.log(card)
 
@@ -83,13 +52,14 @@ const loadImages = (sources, x, y) => {
                 x = 100;
                 y += h + gap;
             }
-            loadImages(sources.slice(1), x, y);
+            loadImages(title, sources.slice(1), x, y);
         });
     }
 
 };
 
-const draw = () => {
+const generateImage = (deckCode, deckName, deckCards, deckNation) => {
+
     context.fillStyle = "#FFFFFF";
     context.fillRect(0, 0, width, height);
     
@@ -110,16 +80,18 @@ const draw = () => {
     context.stroke();
 
 
-
     // VGB LOGO
     loadImage("./deckImage/VGB-01.png").then((vgblogo) => {
         context.drawImage(vgblogo, 100, 10, 150, 77);
 
         // CARD IMAGES
-        const sources = Object.values(deck)
-        loadImages(sources, 100, 125);
+        const sources = Object.values(deckCards);
+        const title = `${deckName}-${deckCode}`.replace(/\s/g, '');
+        const res = loadImages(title, sources, 100, 125);
+
+        return res
     });  
 }
 
 
-draw()
+module.exports = generateImage

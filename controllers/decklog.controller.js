@@ -1,3 +1,5 @@
+const generateImage = require("../deckImage/generateImage");
+
 const db = require("../database");
 const deckTable = process.env.DECKTABLE; 
 const oracleTable = process.env.ORACLECARDTABLE;
@@ -113,8 +115,11 @@ exports.search = async (req, res) => {
 
 exports.add_deck = async (req, res) => {
   try {
-    // const table = "deck_dev";
     const deck = req.body;
+
+    const url = generateImage(deck.hash, deck.name, JSON.parse(deck.cards), deck.nation)
+    console.log(url);
+
     const sql = `INSERT INTO ${deckTable} (deck_hash, deck_name, cards, total_cards, nation, types_qty, grades_qty) VALUES (?, ?, ?, ?, ?, ?, ?)`;
     const results = await db
       .promise()
